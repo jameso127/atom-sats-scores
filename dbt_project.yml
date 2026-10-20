@@ -1,0 +1,34 @@
+name: atom_ks2
+version: "1.0.0"
+config-version: 2
+profile: atom_ks2
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+analysis-paths: ["analyses"]
+snapshot-paths: ["snapshots"]
+
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Point-in-time date (YYYY-MM-DD). null = the latest answered_at in the data; never current_date().
+  as_at: null
+  # Force a conversion table year; null = ks2_table_year(as_at) picks it from the seed.
+  conversion_table_year: null
+  # Incremental models re-process this many days to pick up late-arriving responses.
+  lookback_days: 3
+
+models:
+  atom_ks2:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: table
+    marts:
+      +materialized: table
+
+seeds:
+  atom_ks2:
+    +quote_columns: false

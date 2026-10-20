@@ -1,0 +1,27 @@
+sources:
+  - name: raw_de
+    description: Mock Atom pupil activity data. Read only; never write here.
+    database: atom-analytics-candidates
+    schema: raw_de
+    tables:
+      - name: responses
+        description: >
+          One row per question a pupil answered. Expected to exceed 100m rows, so source tests
+          here are left off (they would full-scan); key tests run on the incremental model instead.
+      - name: assessment_sittings
+        description: One row per assessment a pupil sat (session_id = sitting id). Soft-deleted via is_deleted.
+        columns:
+          - name: session_id
+            data_tests: [unique, not_null]
+      - name: pupils
+        description: One row per pupil. Soft-deleted via is_deleted.
+        columns:
+          - name: pupil_id
+            data_tests: [unique, not_null]
+      - name: course_hierarchy
+        description: >
+          One row per question: question → atom → subtopic → topic → subject. Current state only
+          (no validity dates).
+        columns:
+          - name: question_id
+            data_tests: [unique, not_null]
