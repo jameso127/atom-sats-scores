@@ -221,3 +221,13 @@ Decisions made with AI assistance (Claude Code), newest last. Detailed rationale
   App table 399 rows (154 English, 152 Maths, 82 Screeners, 8 VR, 3 NVR); year-score checksum
   unchanged from the previous build, so the long table / view change altered no score. Hand
   check 4/4. As-at 2026-03-01 run as expected; default rebuild restored the current tables.
+
+## 2026-10-21: redundant tests removed
+- User deleted `assert_conversion_years_have_all_tests` (the fetch script already checks it) and
+  asked for other redundant tests. Removed: the 6 source key tests (duplicated by staging tests);
+  the conversion seed's monotonic, range, accepted-values and not-null tests (the script validates
+  them before writing; kept the unique key, since a duplicate would double-count); range /
+  not-null tests on the derived lookup and year scores (range kept once, on the app table);
+  `assert_lookup_has_every_percent` (covered by the script and
+  `assert_scored_subjects_have_scaled_scores`); and the unused `scoring_method` seed column and its
+  two tests.

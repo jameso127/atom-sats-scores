@@ -13,11 +13,6 @@ models:
         description: 100 × n_correct / n_answered (skips count as answered and wrong).
       - name: scaled_score
         description: Maths and English only, from trf_percent_to_scaled_score (null for other subjects).
-        data_tests:
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 80
-                max_value: 120
       - name: conversion_table_year
         description: STA table used; the academic year (Sep-Aug) of last_answered_date.
       - name: last_answered_date

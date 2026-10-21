@@ -2,15 +2,13 @@ seeds:
   - name: seed_subject_to_ks2_test
     description: >
       Maps Atom subject_name to the KS2 test(s) whose conversion curve scores it, with weights.
-      Subjects not listed (Science, Verbal Reasoning, Non-Verbal Reasoning, Wellbeing, Screeners)
-      are not scored. Rationale in PLAN.md / README.
+      Subjects not listed get % correct only, no scaled score. Rationale in PLAN.md / README.
       Grain: one row per subject_name × ks2_test.
     config:
       column_types:
         subject_name: string
         ks2_test: string
         weight: numeric
-        scoring_method: string
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -33,10 +31,3 @@ seeds:
           - dbt_utils.expression_is_true:
               arguments:
                 expression: "> 0 and weight <= 1"
-      - name: scoring_method
-        description: "official (one KS2 test) or official_blended (weighted across tests)."
-        data_tests:
-          - not_null
-          - accepted_values:
-              arguments:
-                values: [official, official_blended]

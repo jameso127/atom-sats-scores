@@ -105,9 +105,11 @@ partitions); staging is views. The ready tables rebuild in full from the daily t
 year_group)` and holds the audit columns (`n_answered, n_correct, percent_correct, scaled_score,
 conversion_table_year, last_answered_date`).
 
-**Tests:** unique / not_null on every key; relationships from responses to pupils, sittings and
-questions (severity: warn, as orphans are a DQ finding); seed weights sum to 1 per subject; each conversion year has all three tests; conversion table is monotonic;
-scaled score in the range 80–120; the lookup has all 101 percents per year × subject; one app row per pupil × subject.
+**Tests** (only where they add something): unique / not_null on the staging keys; a warning for
+responses whose sitting is missing (a DQ finding); unique keys on every model that's joined or
+served; mapping seed weights in (0, 1] and summing to 1 per subject; every Maths / English score
+finds a conversion table; app table scaled scores in 80–120. The conversion seeds aren't
+re-tested in dbt beyond a unique key: the fetch script validates them before writing.
 
 ## Timeline
 

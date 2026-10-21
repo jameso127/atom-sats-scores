@@ -57,6 +57,8 @@ ai/           planning_log.md; sources/ = saved GOV.UK pages
   Analyses use full table names so they paste into the BigQuery console, and return aggregates
   only, never pupil-level rows.
 - Every model has a yml entry with a description, the grain in words, and tests on its key.
+  Don't add tests that repeat another test or the fetch script's seed validation; test where
+  data enters (staging keys), where logic can break, and the app table's contract.
 - snake_case; IDs end `_id`, dates `_date`, timestamps `_at`.
 
 ## Design rules

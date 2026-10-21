@@ -26,11 +26,3 @@ models:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns: [test_year, subject_name, percent_correct]
-    columns:
-      - name: scaled_score
-        data_tests:
-          - not_null
-          - dbt_utils.accepted_range:
-              arguments:
-                min_value: 80
-                max_value: 120
