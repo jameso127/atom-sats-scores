@@ -1,10 +1,14 @@
 -- Each scored subject's KS2 test weights must sum to 1, or its scaled score is not a true average.
-with weights as (
-    select subject_name, sum(weight) as total_weight
-    from {{ ref('seed_subject_to_ks2_test') }}
-    group by subject_name
+WITH weights AS (
+    SELECT
+        subject_name,
+        SUM(weight) AS total_weight
+    FROM {{ ref('seed_subject_to_ks2_test') }}
+    GROUP BY subject_name
 )
 
-select *
-from weights
-where abs(total_weight - 1) > 0.000001
+SELECT
+    subject_name,
+    total_weight
+FROM weights
+WHERE ABS(total_weight - 1) > 0.000001

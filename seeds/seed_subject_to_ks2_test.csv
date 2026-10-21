@@ -2,6 +2,3 @@ subject_name,ks2_test,weight,scoring_method
 Maths,maths,1.0,official
 English,reading,0.5,official_blended
 English,gps,0.5,official_blended
-Science,maths,0.3333333333,proxy
-Science,reading,0.3333333333,proxy
-Science,gps,0.3333333334,proxy
