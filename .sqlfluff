@@ -1,0 +1,44 @@
+[sqlfluff]
+dialect = bigquery
+# Jinja templater with dbt builtins (ref, source, var, config, is_incremental) so linting runs
+# locally without compiling through dbt or connecting to BigQuery.
+templater = jinja
+max_line_length = 120
+# ST06: keep columns in the order written. (AM04 is on: no `SELECT *`, list columns explicitly.)
+exclude_rules = ST06
+
+[sqlfluff:templater:jinja]
+apply_dbt_builtins = True
+
+[sqlfluff:indentation]
+tab_space_size = 4
+indented_joins = False
+indented_using_on = True
+
+# Align column aliases (`AS ...`) within each select clause.
+[sqlfluff:layout:type:alias_expression]
+spacing_before = align
+align_within = select_clause
+spacing_after = single
+
+# Keywords, functions, literals (TRUE / NULL) and types in capitals; names stay lowercase.
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.types]
+extended_capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:aliasing.table]
+aliasing = explicit
+
+[sqlfluff:rules:aliasing.column]
+aliasing = explicit

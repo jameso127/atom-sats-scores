@@ -1,0 +1,6 @@
+# Profiling queries: later `union all` branches take their column names from the first (AL03), and
+# positional `group by 1, 2` is fine for ad-hoc aggregates (AM06).
+[sqlfluff]
+exclude_rules = ST06, AL03, AM06
+# Wider lines so long aggregate expressions keep their aliases aligned on one line.
+max_line_length = 140
