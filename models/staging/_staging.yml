@@ -1,0 +1,35 @@
+models:
+  - name: stg_responses
+    description: "Responses (a view). Grain: one row per response."
+    columns:
+      - name: response_id
+        data_tests: [unique, not_null]
+      - name: session_id
+        description: 56 ids (1,433 rows) are missing from the sittings table; those responses aren't scored.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_assessment_sittings')
+                field: session_id
+              config:
+                severity: warn
+
+  - name: stg_assessment_sittings
+    description: "Non-deleted sittings. Grain: one row per sitting."
+    columns:
+      - name: session_id
+        data_tests: [unique, not_null]
+      - name: style
+        description: Only fixed_question and non_adaptive are scored.
+
+  - name: stg_pupils
+    description: "Non-deleted pupils. Grain: one row per pupil."
+    columns:
+      - name: pupil_id
+        data_tests: [unique, not_null]
+
+  - name: stg_course_hierarchy
+    description: "Question to subject. Grain: one row per question."
+    columns:
+      - name: question_id
+        data_tests: [unique, not_null]

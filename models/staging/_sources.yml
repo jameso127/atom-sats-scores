@@ -1,8 +1,8 @@
 sources:
-  - name: raw_de
+  - name: de_raw
     description: Mock Atom pupil activity data. Read only; never write here.
     database: atom-analytics-candidates
-    schema: raw_de
+    schema: de_raw
     tables:
       - name: responses
         description: >

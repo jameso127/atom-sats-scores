@@ -1,0 +1,52 @@
+models:
+  - name: pupil_subject_year_scores
+    description: >
+      % correct per year group, for every subject, plus a KS2 scaled score (80-120) for Maths and
+      English. Grain: one row per pupil × subject × year group, adding up every in-scope response
+      from sittings in that year group, up to the as-at date. Key (pupil_id, subject_name, year_group).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [pupil_id, subject_name, year_group]
+    columns:
+      - name: percent_correct
+        description: 100 × n_correct / n_answered (skips count as answered and wrong).
+      - name: scaled_score
+        description: Maths and English only, from trf_percent_to_scaled_score (null for other subjects).
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 80
+                max_value: 120
+      - name: conversion_table_year
+        description: STA table used; the academic year (Sep-Aug) of last_answered_date.
+      - name: last_answered_date
+        description: The pupil's latest response in that year group (on or before the as-at date).
+
+  - name: pupil_subject_sats_scores
+    description: >
+      The app table. Grain: one row per non-deleted pupil × subject they have responses in, from
+      their latest year group in that subject; no row = no responses yet. Key (pupil_id,
+      subject_name). Maths and English have scaled scores; other subjects % correct only.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [pupil_id, subject_name]
+    columns:
+      - name: pupil_id
+        data_tests: [not_null]
+      - name: subject_name
+        data_tests: [not_null]
+      - name: year_group
+        description: "Year group the score is for (KS1 = Years 1-2: an on-track measure on the KS2 scale)."
+      - name: scaled_score
+        description: Maths and English only (null for other subjects).
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 80
+                max_value: 120
+      - name: percent_correct
+        description: 100 × n_correct / n_answered.
+      - name: n_answered
+        description: Responses the score is based on, so the app can judge how reliable it is.

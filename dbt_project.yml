@@ -5,7 +5,6 @@ profile: atom_ks2
 
 model-paths: ["models"]
 seed-paths: ["seeds"]
-macro-paths: ["macros"]
 test-paths: ["tests"]
 analysis-paths: ["analyses"]
 snapshot-paths: ["snapshots"]
@@ -13,22 +12,30 @@ snapshot-paths: ["snapshots"]
 clean-targets: ["target", "dbt_packages"]
 
 vars:
-  # Point-in-time date (YYYY-MM-DD). null = the latest answered_at in the data; never current_date().
+  # Point-in-time date (YYYY-MM-DD). null = the latest answered date in the data; never current_date().
   as_at: null
-  # Force a conversion table year; null = ks2_table_year(as_at) picks it from the seed.
-  conversion_table_year: null
-  # Incremental models re-process this many days to pick up late-arriving responses.
+  # The incremental model recomputes this many recent days, to pick up late-arriving responses.
   lookback_days: 3
 
 models:
   atom_ks2:
     staging:
       +materialized: view
-    intermediate:
+    transform:
       +materialized: table
-    marts:
+    ready:
       +materialized: table
 
 seeds:
   atom_ks2:
     +quote_columns: false
+    # One seed per year, all the same shape; combined in stg_ks2_scaled_score_conversion.
+    ks2_scaled_scores:
+      +column_types:
+        test_year: int64
+        ks2_test: string
+        raw_score: int64
+        scaled_score: int64
+        max_raw_score: int64
+        min_raw_for_scaled_score: int64
+        published_date: date
