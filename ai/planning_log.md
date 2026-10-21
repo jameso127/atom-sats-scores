@@ -215,3 +215,9 @@ Decisions made with AI assistance (Claude Code), newest last. Detailed rationale
   incremental copy scans the same ~10 MB per run as a view filtered by the incremental daily
   model, and adds a second table (and its delete / late-data handling). Reverted to a view; the
   daily model stays incremental. Revisit if the raw table is partitioned or more models read it.
+
+## 2026-10-21: rebuilt and verified (long app table, view staging)
+- `dbt build --full-refresh`: 59 pass, 1 expected warning. Incremental run: identical checksums.
+  App table 399 rows (154 English, 152 Maths, 82 Screeners, 8 VR, 3 NVR); year-score checksum
+  unchanged from the previous build, so the long table / view change altered no score. Hand
+  check 4/4. As-at 2026-03-01 run as expected; default rebuild restored the current tables.

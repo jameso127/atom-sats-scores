@@ -151,11 +151,11 @@ Full log with numbers: `analyses/FINDINGS.md`. The issues that affect scores:
 ## Verification
 Run on 2026-10-21.
 
-- **`dbt build --full-refresh`:** 60 tests pass; 1 expected warning (the 1,433 responses whose
+- **`dbt build --full-refresh`:** 59 tests pass; 1 expected warning (the 1,433 responses whose
   sitting is missing).
 - **Re-runnable:** row counts and an order-independent checksum of each model
   (`analyses/29_output_checksums.sql`) are identical after the full refresh and an incremental
-  run: 63,707 responses → 1,415 daily rows → 407 year scores → 242 pupils.
+  run: 63,707 responses → 1,415 daily rows → 407 year scores → 399 app rows (pupil × subject).
 - **Hand check** (`analyses/30_hand_check.sql`): the current score is recomputed straight from
   `de_raw` for the most active KS1 and KS2 pupil in each subject; all four match the model.
 
@@ -167,9 +167,15 @@ Run on 2026-10-21.
   | Maths | 5 | 189 | 97 | 51.3% | maths raw 56 → 99 | 99 |
 - **As-at run** (`as_at: 2026-03-01`): 134 pupils have English and Maths scores (no Screeners or
   reasoning sittings by then); rebuilding without `as_at` restores the original checksum.
-- **Distribution** (`analyses/31_score_distribution.sql`): English median 102 (154 pupils, 65%
-  meet the expected standard); Maths median 101 (152 pupils, 57%); Screeners average 52% correct
-  (82 pupils).
+- **Distribution** (`analyses/31_score_distribution.sql`, app table):
+
+  | subject | pupils | scaled score quartiles | meet expected (≥ 100) | avg % correct |
+  |---|---|---|---|---|
+  | English | 154 | 85 / 98 / 102 / 105 / 120 | 65% | 57.8 |
+  | Maths | 152 | 80 / 97 / 101 / 104 / 114 | 57% | 57.6 |
+  | Screeners | 82 | — | — | 52.4 |
+  | Verbal Reasoning | 8 | — | — | 46.3 |
+  | Non-Verbal Reasoning | 3 | — | — | 63.9 |
 
 ## Limitations and next steps
 - Score the 1,196 English / Maths responses whose sitting is missing, with an assumed style.
