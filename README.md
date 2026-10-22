@@ -20,8 +20,7 @@ published scaled-score tables to understand exactly what a "SATs-style" score me
 converts raw marks. With that grounding, I worked with Claude to plan the build and identify the
 pitfalls up front: point-in-time correctness, incremental loading at scale, and data quality traps.
 Profiling then challenged several of the plan's assumptions, so the approach deviated from the
-original plan along the way, each change recorded in [`ai/planning_log.md`](ai/planning_log.md). I'm
-happy with where it landed.
+original plan along the way, each change recorded in [`ai/planning_log.md`](ai/planning_log.md).
 
 Four principles shaped everything:
 
@@ -199,9 +198,6 @@ GCSEs five years later. So:
 - **Score the 1,196 English / Maths answers whose sitting is missing**, using an assumed style.
 - **Confirm the repeated rows** with the platform team; if they're duplicates, de-duplicate at source.
 - **Whole-percent lookup** can be about 1 point low near a boundary on KS2 Maths (1% ≈ 1.1 marks); 0.1% steps would be a one-number change.
-- **Incremental edge cases:** a pupil deleted after their answers were loaded, or data arriving more than 3 days late, is only picked up by a full refresh. There's no load timestamp, so a scheduled full refresh is the production answer.
-- **Partition the raw `responses` table** on `answered_at` so each run reads only recent days (it scans about 10 MB today).
-- **Snapshot `course_hierarchy`** (it has no history), add topic names to split English into reading and GPS, and consider IRT difficulty calibration, which would let adaptive sittings be scored.
 
 ---
 
