@@ -1,4 +1,4 @@
--- Each scored subject's KS2 test weights must sum to 1, or its scaled score is not a true average.
+-- Each scored subject's test weights must sum to 1, or its scaled score is not a true average.
 WITH weights AS (
     SELECT
         subject_name,
