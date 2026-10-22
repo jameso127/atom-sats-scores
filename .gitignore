@@ -5,6 +5,7 @@ logs/
 .user.yml
 profiles.yml
 analyses/results
+
 # Python / uv
 .venv/
 __pycache__/

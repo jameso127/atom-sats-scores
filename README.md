@@ -26,7 +26,7 @@ Four principles shaped everything:
 
 | | |
 |---|---|
-| 🎯 **Start from the why** | The scores aren't the end product: they'll be shown to pupils and parents in the app, and used as features for predictive modelling.  |
+| 🎯 **Start from the why** | The scores aren't the end product: they'll be shown to pupils and parents in the app, and used as features for predictive modelling. |
 | 🔍 **Profile before modelling** | No model was written until 28 profiling queries had been run. Several starting assumptions turned out wrong, and every decision below points back to the evidence in [`analyses/FINDINGS.md`](analyses/FINDINGS.md). |
 | 📐 **Use the official curves** | Scores come from the STA's published conversion tables, fetched from GOV.UK and stored as seeds, never a home-made formula. KS1 pupils use the KS1 tables, KS2 pupils the KS2 tables. |
 | ✂️ **Keep it simple** | Plain, readable SQL enforced by SQLFluff. Every model is short enough to read top to bottom. |
@@ -140,13 +140,12 @@ Full log with every number: [`analyses/FINDINGS.md`](analyses/FINDINGS.md).
 - **Re-runnable:** row counts and checksums are identical after a full refresh and an incremental run.
 - **Hand-checked:** four scores recomputed straight from the raw data match the model exactly.
 
-
 ---
 
 ## Predicting GCSE grades
 
 <p align="center">
-  <img src="docs/assets/gcse.svg" width="100%" alt="Illustrative diagram: scaled-score trajectory, % correct in other subjects, engagement and context feed a model trained on linked GCSE outcomes, which outputs a probability for each grade 1 to 9">
+  <img src="docs/assets/gcse.svg" width="100%" alt="Illustrative diagram: scores from Year 1 to Year 6, % correct in other subjects, engagement and context feed an XGBoost / LightGBM model per GCSE subject, which outputs a probability for each grade 1 to 9">
 </p>
 
 *Brief, step 3: how might we predict a pupil's GCSE results from their primary-school work, and
