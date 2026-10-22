@@ -231,3 +231,32 @@ Decisions made with AI assistance (Claude Code), newest last. Detailed rationale
   `assert_lookup_has_every_percent` (covered by the script and
   `assert_scored_subjects_have_scaled_scores`); and the unused `scoring_method` seed column and its
   two tests.
+
+## 2026-10-22: KS1 scaled scores and the key-stage match
+- Git: renamed the GitHub branch to `main` (the default); KS1 work on `ks1-scaled-scores` for a PR.
+- KS1 tables: STA publishes "Optional key stage 1 tests: <year> scaled scores" for 2024-2026
+  (85-115; full marks GPS 40, reading 40, maths 60), same page format as KS2. The script is now
+  `build_conversion_seed.py <ks1|ks2> <year>`; seeds moved to `seeds/scaled_scores/` with
+  `key_stage` and `min_scaled_score` columns (KS2 values verified identical). `ks2_test` renamed
+  `test_name`; mapping seed renamed `seed_subject_to_test` (same blend at both key stages).
+- New `trf_assessment_key_stage`: each assessment's key stage = most sittings by pupils' key stage
+  at the time, tie = KS2 (user's choice). The daily model keeps only responses where the pupil's
+  key stage matches, in both directions (user's choice). The lookup and year scores join on key
+  stage; raw 0-2 counts as the scale bottom (85 / 80). App table gains `key_stage`; its range test
+  is per key stage.
+- New analysis 32 sizes the responses dropped by the match; hand check 30 updated to replicate it.
+- Not built yet (needs the user's OK for dbt and bq).
+- Built and verified (user approved): 45 pass + 1 expected warning; identical checksums across
+  full refresh and incremental (1,399 daily → 405 year scores → 399 app rows); hand check 4/4 with
+  KS1 pupils on KS1 tables (e.g. Year 2 English 114 on KS2 curve → 108 on KS1); the key-stage
+  match drops 566 responses, no tied assessments. Query 31 now splits by key stage.
+
+## 2026-10-22: table aliases at least 4 characters
+- User asked for a SQLFluff rule enforcing longer table aliases. Added AL06
+  (`aliasing.length`, `min_alias_length = 4`) to `.sqlfluff`; it applies to models, tests and
+  analyses. AL06 can't auto-fix, so 91 aliases in 25 files were renamed with consistent names
+  (responses → `resp`, sittings → `sitting`, pupils → `pupil`, questions → `question`, assessment
+  key stage → `assess`, totals → `total`, mapping → `mapping`, conversion → `conv`). Two first
+  attempts failed lint and were corrected: `lookup` is a BigQuery reserved word (now
+  `pct_lookup`), and `tbl` was still 3 characters (now `model_rows`). Lint clean; a scan found no
+  leftover short alias references.

@@ -33,18 +33,18 @@ per_question AS (
 )
 
 SELECT
-    q.subject_name,
+    question.subject_name,
     CASE
-        WHEN pq.n_sittings = 1 THEN 'seen in only one sitting'
-        WHEN pq.n_sittings_repeated = pq.n_sittings AND pq.min_rows = pq.max_rows
+        WHEN per_q.n_sittings = 1 THEN 'seen in only one sitting'
+        WHEN per_q.n_sittings_repeated = per_q.n_sittings AND per_q.min_rows = per_q.max_rows
             THEN 'same row count in every sitting'
-        WHEN pq.n_sittings_repeated = pq.n_sittings THEN 'repeated in every sitting, varying count'
+        WHEN per_q.n_sittings_repeated = per_q.n_sittings THEN 'repeated in every sitting, varying count'
         ELSE 'repeated in some sittings only'
-    END                         AS pattern,
-    COUNT(*)                    AS n_questions,
-    SUM(pq.n_sittings)          AS n_sittings_answered,
-    SUM(pq.n_sittings_repeated) AS n_sittings_repeated
-FROM per_question AS pq
-LEFT JOIN questions AS q ON pq.question_id = q.question_id
+    END                            AS pattern,
+    COUNT(*)                       AS n_questions,
+    SUM(per_q.n_sittings)          AS n_sittings_answered,
+    SUM(per_q.n_sittings_repeated) AS n_sittings_repeated
+FROM per_question AS per_q
+LEFT JOIN questions AS question ON per_q.question_id = question.question_id
 GROUP BY 1, 2
 ORDER BY 1, 2

@@ -3,7 +3,7 @@ WITH weights AS (
     SELECT
         subject_name,
         SUM(weight) AS total_weight
-    FROM {{ ref('seed_subject_to_ks2_test') }}
+    FROM {{ ref('seed_subject_to_test') }}
     GROUP BY subject_name
 )
 

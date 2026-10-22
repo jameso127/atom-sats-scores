@@ -25,16 +25,16 @@ questions AS (
 )
 
 SELECT
-    COUNT(*)                                                     AS n_responses,
-    COUNTIF(r.pupil_id IS NULL)                                  AS n_null_pupil_id,
-    COUNTIF(r.pupil_id IS NOT NULL AND p.pupil_id IS NULL)       AS n_pupil_not_found,
-    COUNTIF(p.is_deleted)                                        AS n_pupil_deleted,
-    COUNTIF(r.session_id IS NULL)                                AS n_null_session_id,
-    COUNTIF(r.session_id IS NOT NULL AND s.session_id IS NULL)   AS n_sitting_not_found,
-    COUNTIF(s.is_deleted)                                        AS n_sitting_deleted,
-    COUNTIF(r.question_id IS NULL)                               AS n_null_question_id,
-    COUNTIF(r.question_id IS NOT NULL AND q.question_id IS NULL) AS n_question_not_found
-FROM `atom-analytics-candidates.de_raw.responses` AS r
-LEFT JOIN pupils AS p ON r.pupil_id = p.pupil_id
-LEFT JOIN sittings AS s ON r.session_id = s.session_id
-LEFT JOIN questions AS q ON r.question_id = q.question_id
+    COUNT(*)                                                               AS n_responses,
+    COUNTIF(resp.pupil_id IS NULL)                                         AS n_null_pupil_id,
+    COUNTIF(resp.pupil_id IS NOT NULL AND pupil.pupil_id IS NULL)          AS n_pupil_not_found,
+    COUNTIF(pupil.is_deleted)                                              AS n_pupil_deleted,
+    COUNTIF(resp.session_id IS NULL)                                       AS n_null_session_id,
+    COUNTIF(resp.session_id IS NOT NULL AND sitting.session_id IS NULL)    AS n_sitting_not_found,
+    COUNTIF(sitting.is_deleted)                                            AS n_sitting_deleted,
+    COUNTIF(resp.question_id IS NULL)                                      AS n_null_question_id,
+    COUNTIF(resp.question_id IS NOT NULL AND question.question_id IS NULL) AS n_question_not_found
+FROM `atom-analytics-candidates.de_raw.responses` AS resp
+LEFT JOIN pupils AS pupil ON resp.pupil_id = pupil.pupil_id
+LEFT JOIN sittings AS sitting ON resp.session_id = sitting.session_id
+LEFT JOIN questions AS question ON resp.question_id = question.question_id

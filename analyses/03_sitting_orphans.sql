@@ -18,15 +18,15 @@ sitting_responses AS (
 
 sittings AS (
     SELECT
-        s.session_id,
-        s.pupil_id,
-        s.is_deleted,
-        p.pupil_id IS NULL            AS is_pupil_missing,
-        COALESCE(p.is_deleted, FALSE) AS is_pupil_deleted,
-        sr.session_id IS NULL         AS has_no_responses
-    FROM `atom-analytics-candidates.de_raw.assessment_sittings` AS s
-    LEFT JOIN pupils AS p ON s.pupil_id = p.pupil_id
-    LEFT JOIN sitting_responses AS sr ON s.session_id = sr.session_id
+        sitting.session_id,
+        sitting.pupil_id,
+        sitting.is_deleted,
+        pupil.pupil_id IS NULL            AS is_pupil_missing,
+        COALESCE(pupil.is_deleted, FALSE) AS is_pupil_deleted,
+        sit_resp.session_id IS NULL       AS has_no_responses
+    FROM `atom-analytics-candidates.de_raw.assessment_sittings` AS sitting
+    LEFT JOIN pupils AS pupil ON sitting.pupil_id = pupil.pupil_id
+    LEFT JOIN sitting_responses AS sit_resp ON sitting.session_id = sit_resp.session_id
 ),
 
 pupils_with_sittings AS (
@@ -46,7 +46,7 @@ SELECT
     (SELECT COUNTIF(is_deleted) FROM pupils)           AS n_pupils_deleted,
     (SELECT SUM(n_null_deleted) FROM pupils)           AS n_pupils_is_deleted_null,
     (
-        SELECT COUNT(*) FROM pupils                    AS p
-        LEFT JOIN pupils_with_sittings                 AS ps ON p.pupil_id = ps.pupil_id
-        WHERE ps.pupil_id IS NULL
+        SELECT COUNT(*) FROM pupils                    AS pupil
+        LEFT JOIN pupils_with_sittings                 AS with_sit ON pupil.pupil_id = with_sit.pupil_id
+        WHERE with_sit.pupil_id IS NULL
     )                                                  AS n_pupils_no_sittings

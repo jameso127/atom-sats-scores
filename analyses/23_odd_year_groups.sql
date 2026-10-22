@@ -27,37 +27,37 @@ o AS (SELECT DISTINCT pupil_id FROM odd),
 
 pupil_other_year_groups AS (
     SELECT
-        s.pupil_id,
-        STRING_AGG(DISTINCT CAST(s.year_group_at_sitting AS STRING), ', ') AS other_year_groups
-    FROM `atom-analytics-candidates.de_raw.assessment_sittings` AS s
-    INNER JOIN o ON s.pupil_id = o.pupil_id
-    WHERE s.year_group_at_sitting BETWEEN 1 AND 6
-    GROUP BY s.pupil_id
+        sitting.pupil_id,
+        STRING_AGG(DISTINCT CAST(sitting.year_group_at_sitting AS STRING), ', ') AS other_year_groups
+    FROM `atom-analytics-candidates.de_raw.assessment_sittings` AS sitting
+    INNER JOIN o ON sitting.pupil_id = odd_sit.pupil_id
+    WHERE sitting.year_group_at_sitting BETWEEN 1 AND 6
+    GROUP BY sitting.pupil_id
 ),
 
 odd_subjects AS (
     SELECT
-        r.session_id,
-        STRING_AGG(DISTINCT q.subject_name, ' + ') AS subjects,
-        COUNT(*)                                   AS n_responses
-    FROM `atom-analytics-candidates.de_raw.responses` AS r
-    INNER JOIN odd AS o ON r.session_id = o.session_id
-    LEFT JOIN questions AS q ON r.question_id = q.question_id
-    GROUP BY r.session_id
+        resp.session_id,
+        STRING_AGG(DISTINCT question.subject_name, ' + ') AS subjects,
+        COUNT(*)                                          AS n_responses
+    FROM `atom-analytics-candidates.de_raw.responses` AS resp
+    INNER JOIN odd AS odd_sit ON resp.session_id = odd_sit.session_id
+    LEFT JOIN questions AS question ON resp.question_id = question.question_id
+    GROUP BY resp.session_id
 )
 
 SELECT
-    o.year_group_at_sitting,
-    o.assessment_id,
-    o.style,
-    o.session_type,
-    os.subjects,
-    COALESCE(p.other_year_groups, '(none)') AS pupil_other_year_groups,
-    COUNT(*)                                AS n_sittings,
-    COUNT(DISTINCT o.pupil_id)              AS n_pupils,
-    SUM(COALESCE(os.n_responses, 0))        AS n_responses
-FROM odd AS o
-LEFT JOIN odd_subjects AS os ON o.session_id = os.session_id
-LEFT JOIN pupil_other_year_groups AS p ON o.pupil_id = p.pupil_id
+    odd_sit.year_group_at_sitting,
+    odd_sit.assessment_id,
+    odd_sit.style,
+    odd_sit.session_type,
+    odd_subj.subjects,
+    COALESCE(other_yg.other_year_groups, '(none)') AS pupil_other_year_groups,
+    COUNT(*)                                       AS n_sittings,
+    COUNT(DISTINCT odd_sit.pupil_id)               AS n_pupils,
+    SUM(COALESCE(odd_subj.n_responses, 0))         AS n_responses
+FROM odd AS odd_sit
+LEFT JOIN odd_subjects AS odd_subj ON odd_sit.session_id = odd_subj.session_id
+LEFT JOIN pupil_other_year_groups AS other_yg ON odd_sit.pupil_id = other_yg.pupil_id
 GROUP BY 1, 2, 3, 4, 5, 6
 ORDER BY 1, 2

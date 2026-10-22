@@ -5,12 +5,13 @@
 > is the README; how the design changed along the way is in `ai/planning_log.md`.
 
 ## Goal
-Every non-deleted pupil gets, per subject they've done, a KS2 SATs-style scaled score of 80–120
-(Maths and English) and % correct (all assessed subjects), in a long app table. The build is
+Every non-deleted pupil gets, per subject they've done, a SATs-style scaled score on their key
+stage's official scale (KS1 85–115, KS2 80–120; Maths and English) and % correct (all assessed subjects), in a long app table. The build is
 re-runnable, can give the score as at any date, and produces a flat table ready for the app database.
 
-**KS1 and KS2 pupils are both scored on the one KS2 80–120 scale**, because the brief defines the
-scale as 80–120 and one curve is simplest. Each year group is scored separately (see below).
+**Each key stage uses its own STA tables** (originally everyone was on the KS2 scale; KS1 tables
+were added later). Each year group is scored separately, and only responses where the pupil's
+key stage matches the assessment's count (see below).
 
 ## Scoring: % correct → lookup table → scaled score
 Atom's assessments are shorter than real SATs papers and vary in length, so a raw total can't be
@@ -37,11 +38,10 @@ Why not map the percentage linearly onto 80–120? The official curve isn't line
 (99/110) scores 112 on the table, while a straight line gives 116.
 
 **Caveats for the README:**
-- KS1 and Year 3–4 pupils haven't reached the SATs stage, so their score is an on-track measure for
-  age-appropriate work, not current SATs attainment. `year_group`
-  is in the output so the app can label it. Real KS1 tests have
-  their own 85–115 scale; using it would be a seed change (add a key stage column), noted as a
-  next step.
+- KS1 scores are on the 85–115 KS1 scale and KS2 on 80–120, so `key_stage` must be shown with the
+  score. Year 3–4 pupils are on the KS2 curve, an on-track measure rather than SATs attainment.
+- An assessment's key stage is the majority of its sittings (tie = KS2); pupils in the other key
+  stage aren't scored on it.
 - Scores are per year group, so a Year 5 score isn't diluted by Year 2 work. The current score is
   the latest year group's, so early in a new school year it rests on few responses.
 - The conversion table follows the academic year, not calendar year: the 2026 table isn't
@@ -50,7 +50,8 @@ Why not map the percentage linearly onto 80–120? The official curve isn't line
 
 ## Subjects
 The data has seven subjects, but only three KS2 tests (maths, reading, GPS) have a scaled score.
-The mapping lives in `seeds/seed_subject_to_ks2_test.csv`, so changing a decision is a seed edit.
+The mapping lives in `seeds/seed_subject_to_test.csv` (same at KS1 and KS2), so changing a
+decision is a seed edit.
 
 | subject_name | Treatment | Mapping | Why |
 |---|---|---|---|
@@ -73,9 +74,10 @@ de_raw.*  (source)
  └ stg_responses, stg_assessment_sittings, stg_pupils, stg_course_hierarchy     views
      only the columns used; drop is_deleted rows (pupils, sittings)
 seed_ks2_scaled_scores_<year>  (one per year)
- └ stg_ks2_scaled_score_conversion           view; union all of the year seeds (generated)
+ └ stg_scaled_score_conversion               view; union all of the KS1 + KS2 seeds (generated)
 
 ── transform ──
+ └ trf_assessment_key_stage                  table; each assessment's majority key stage
  └ trf_percent_to_scaled_score               table; conversion year × subject × percent (0-100)
      → scaled score (English blended); built from the seeds
  └ trf_pupil_subject_daily                   incremental, insert_overwrite by answered_date
@@ -138,7 +140,7 @@ distribution, not a single grade.
 
 ## Next steps (README)
 A `course_hierarchy` snapshot; topic names to split English into reading and
-GPS properly; KS1 scoring on its own 85–115 scale (needs KS1 tables and a key stage column in the seeds);
+GPS properly;
 2023 and earlier tables; recency weighting; IRT difficulty calibration
 (would let adaptive sittings be scored, and Atom's questions aren't SATs questions); bitemporal
 history if a load timestamp is added.

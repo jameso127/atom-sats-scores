@@ -1,14 +1,16 @@
 models:
   - name: trf_pupil_subject_daily
     description: >
-      Daily totals of in-scope responses. Grain: one row per pupil × scored subject × year group
-      (of the sitting) × day with activity. Incremental: insert_overwrite of the day partitions in
+      Daily totals of in-scope responses (pupil's key stage matches the assessment's). Grain: one
+      row per pupil × subject × year group (of the sitting) × day with activity. Incremental: insert_overwrite of the day partitions in
       the lookback window.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns: [pupil_id, subject_name, year_group, answered_date]
     columns:
+      - name: key_stage
+        description: The pupil's key stage at the sitting (KS1 = Years 1-2, KS2 = 3-6).
       - name: year_group
         description: year_group_at_sitting of the sittings the responses came from.
         data_tests: [not_null]
@@ -19,10 +21,24 @@ models:
 
   - name: trf_percent_to_scaled_score
     description: >
-      Lookup from % correct (whole percent, rounded down) to KS2 scaled score. Grain: one row per
-      conversion year × scored subject × percent (0-100). Built from the conversion seeds and
-      seed_subject_to_ks2_test (English = half reading, half GPS).
+      Lookup from % correct (whole percent, rounded down) to scaled score. Grain: one row per
+      key stage × conversion year × scored subject × percent (0-100). Built from the conversion seeds and
+      seed_subject_to_test (English = half reading, half GPS).
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
-            combination_of_columns: [test_year, subject_name, percent_correct]
+            combination_of_columns: [key_stage, test_year, subject_name, percent_correct]
+
+  - name: trf_assessment_key_stage
+    description: >
+      The key stage each assessment is mainly sat by. Grain: one row per assessment. Counts its
+      sittings by the pupil's key stage at the time; the larger wins, ties go to KS2. Responses are
+      scored only when the pupil's key stage matches.
+    columns:
+      - name: assessment_id
+        data_tests: [unique, not_null]
+      - name: key_stage
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [KS1, KS2]

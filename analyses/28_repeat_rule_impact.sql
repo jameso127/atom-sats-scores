@@ -13,19 +13,19 @@ WITH questions AS (
 
 per_question AS (
     SELECT
-        q.subject_name,
-        r.pupil_id,
-        COUNT(*)              AS n_rows,
-        COUNTIF(r.is_correct) AS n_correct_rows
-    FROM `atom-analytics-candidates.de_raw.responses` AS r
-    INNER JOIN `atom-analytics-candidates.de_raw.assessment_sittings` AS s
-        ON r.session_id = s.session_id
-    INNER JOIN questions AS q ON r.question_id = q.question_id
+        question.subject_name,
+        resp.pupil_id,
+        COUNT(*)                 AS n_rows,
+        COUNTIF(resp.is_correct) AS n_correct_rows
+    FROM `atom-analytics-candidates.de_raw.responses` AS resp
+    INNER JOIN `atom-analytics-candidates.de_raw.assessment_sittings` AS sitting
+        ON resp.session_id = sitting.session_id
+    INNER JOIN questions AS question ON resp.question_id = question.question_id
     WHERE
-        NOT COALESCE(s.is_deleted, FALSE)
-        AND s.style IN ('fixed_question', 'non_adaptive')
-        AND q.subject_name IN ('Maths', 'English')
-    GROUP BY q.subject_name, r.pupil_id, r.session_id, r.question_id
+        NOT COALESCE(sitting.is_deleted, FALSE)
+        AND sitting.style IN ('fixed_question', 'non_adaptive')
+        AND question.subject_name IN ('Maths', 'English')
+    GROUP BY question.subject_name, resp.pupil_id, resp.session_id, resp.question_id
 ),
 
 per_pupil AS (
