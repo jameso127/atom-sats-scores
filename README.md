@@ -1,23 +1,223 @@
-# Atom: KS2 SATs scaled scores
+<p align="center">
+  <img src="docs/assets/hero.svg" width="100%" alt="SATs-style scaled scores: from raw pupil activity to KS1 and KS2 scaled scores with dbt on BigQuery">
+</p>
 
-A dbt project on BigQuery that gives every pupil a SATs-style scaled score in Maths and English
-(KS1 85–115, KS2 80–120, on the official STA tables for their key stage), plus % correct in every assessed subject, recomputable as at any date. The output is
-a flat, long table (one row per pupil × subject), ready for the app database.
+<p align="center">
 
-Supporting material: `analyses/FINDINGS.md` (profiling and data quality evidence), `PLAN.md`
-(design), `CLAUDE.md` (conventions), `ai/` (AI usage).
 
-## Setup
+<p align="center">
+  <img src="docs/assets/stats.svg" width="100%" alt="63,707 responses profiled, 242 pupils, 399 pupil × subject scores, 45 dbt tests passing">
+</p>
+
+## The task, and how I approached it
+
+Atom's app needs a **SATs-style scaled score** for every pupil in every subject: the same 80–120
+scale the government uses for KS2 tests. It has to be re-runnable, recomputable as at any date and
+ready to drop into the app database.
+
+**How I got here.** I started by exploring the raw data in BigQuery, then read the government's
+published scaled-score tables to understand exactly what a "SATs-style" score means and how STA
+converts raw marks. With that grounding, I worked with Claude to plan the build and identify the
+pitfalls up front: point-in-time correctness, incremental loading at scale, and data quality traps.
+Profiling then challenged several of the plan's assumptions, so the approach deviated from the
+original plan along the way, each change recorded in [`ai/planning_log.md`](ai/planning_log.md). I'm
+happy with where it landed.
+
+Four principles shaped everything:
+
+| | |
+|---|---|
+| 🎯 **Start from the why** | The scores aren't the end product: they'll be shown to pupils and parents in the app, and used as features for predictive modelling.  |
+| 🔍 **Profile before modelling** | No model was written until 28 profiling queries had been run. Several starting assumptions turned out wrong, and every decision below points back to the evidence in [`analyses/FINDINGS.md`](analyses/FINDINGS.md). |
+| 📐 **Use the official curves** | Scores come from the STA's published conversion tables, fetched from GOV.UK and stored as seeds, never a home-made formula. KS1 pupils use the KS1 tables, KS2 pupils the KS2 tables. |
+| ✂️ **Keep it simple** | Plain, readable SQL enforced by SQLFluff. Every model is short enough to read top to bottom. |
+
+---
+
+## How it works
+
+<p align="center">
+  <img src="docs/assets/pipeline.svg" width="100%" alt="Pipeline: raw tables and STA tables flow through staging views into the transform layer (assessment key stage, daily incremental totals, % to scaled score lookup) and into the ready tables">
+</p>
+
+| Layer | What happens | Why |
+|---|---|---|
+| **Staging** | Views over the four source tables, with only the columns that are used. Soft deletes are filtered here, and each sitting gets the pupil's key stage. The STA seeds are unioned into one conversion table. | One place for cleaning. Views stay current and cost nothing to store. |
+| **Transform** | `trf_pupil_subject_daily` counts answered and correct per pupil × subject × year group × day. It's the only model that touches the big table, and it's **incremental**: it overwrites the last 3 days' partitions. `trf_assessment_key_stage` decides each assessment's key stage, and `trf_percent_to_scaled_score` is a lookup from % to scaled score. | `responses` is expected to grow past 100m rows. Everything downstream reads a table of about 1,400 rows instead. |
+| **Ready** | `pupil_subject_year_scores` holds a score per year group. `pupil_subject_sats_scores` is the **app table**, one row per pupil × subject, taken from their latest year group. | A flat, long table with a clear key `(pupil_id, subject_name)` is the easiest thing for an app database to consume. |
+
+---
+
+## Turning answers into a scaled score
+
+Atom's assessments are shorter than real SATs papers and vary in length, so a raw total can't be
+looked up directly. Instead, each pupil's answers are converted through a percentage:
+
+<p align="center">
+  <img src="docs/assets/scoring.svg" width="100%" alt="Worked example: 157 of 181 correct, 86% correct, equivalent raw marks 34 and 34 out of 40, official KS1 2025 tables give 109 and 107, scaled score 108">
+</p>
+
+1. **Add up** every in-scope answer the pupil gave in that subject while in that year group. A skipped question counts as wrong, as on a real paper.
+2. **Percentage correct**, rounded down to a whole percent.
+3. **Equivalent raw mark** on each official test: `⌊percent × full marks ÷ 100⌋`. It rounds down because raw marks are earned.
+4. **Official STA table** for the pupil's key stage and academic year. English averages its reading and grammar, punctuation & spelling (GPS) scores.
+5. **Scaled score.** 100 or more means the pupil meets the expected standard.
+
+Steps 3–5 are worked out once for every whole percent in a small lookup table, so scoring a pupil is
+a single join.
+
+**Why not just stretch the percentage across 80–120?** Because the official curve isn't a straight
+line:
+
+<p align="center">
+  <img src="docs/assets/curve.svg" width="100%" alt="Chart of % correct against scaled score for KS2 and KS1 maths 2025 tables: both are stepped curves, and 90% scores 112 on KS2 where a straight line would give 116">
+</p>
+
+---
+
+## Key decisions
+
+### Each key stage on its own scale, and only matching assessments
+
+KS1 pupils (Years 1–2) are scored on the official **KS1 tables (85–115)**, KS2 pupils (Years 3–6)
+on the **KS2 tables (80–120)**. Every score carries its `key_stage`: a KS1 100 and a KS2 100 both
+mean "expected standard", but they aren't the same score.
+
+Some assessments are sat by both key stages, so each assessment is assigned the key stage **most of
+its sittings** are in (a tie goes to KS2, the harder content). A pupil's answers only count when
+their key stage matches the assessment's. That way a Year 2 pupil stretching to KS2 work, or a Year 5
+pupil revising KS1 work, doesn't distort their score.
+
+<p align="center">
+  <img src="docs/assets/key_stage.svg" width="100%" alt="Two assessments: a mainly-KS1 one where KS2 pupils' responses are crossed out, and a mainly-KS2 one where KS1 pupils' responses are crossed out; 566 responses dropped">
+</p>
+
+### Tables follow the academic year, not the calendar
+
+STA publishes each year's tables in June (KS1) and July (KS2), just before the school year they
+apply to. A score uses the tables for the **academic year** of the pupil's latest answer, so a score
+never depends on a table that didn't exist yet, and adding next year's tables never changes old
+scores.
+
+<p align="center">
+  <img src="docs/assets/academic_year.svg" width="100%" alt="Timeline: tables published June and July 2025, academic year September 2025 to August 2026 uses the 2025 tables; our data runs November 2025 to September 2026">
+</p>
+
+### The rest, at a glance
+
+| Decision | Why |
+|---|---|
+| **One score per year group**; the app shows the latest | A Year 5 score isn't diluted by Year 2 work. The trade-off is that early in a school year the score rests on few answers, so `n_answered` is shipped alongside it. |
+| **Maths and English get scaled scores; Screeners and Verbal / Non-Verbal Reasoning get % correct** | Only Maths, reading and GPS have SATs tests. Screeners are diagnostics, and VR / NVR are 11+ aptitude, not KS2 curriculum. |
+| **Science and Wellbeing aren't included** | Science has 335 questions but no answers yet (it appears automatically when it has some). Wellbeing is surveys with no right answers. |
+| **English = ½ reading + ½ GPS** | Atom's English covers both, and topic names aren't available to split them. |
+| **Long app table, not wide** | A new subject is new rows, not a schema change in the app; "all Maths scores" is a simple `WHERE`. |
+| **Point-in-time via `as_at`** | `dbt build --vars '{as_at: "2026-03-01"}'` adds up only earlier answers. Nothing uses `current_date()`, so the same inputs always give the same output. |
+| **Conversion tables are data** | They're fetched by `scripts/build_conversion_seed.py`, validated, and stored as seeds with their GOV.UK source pages, so adding a year is one command. |
+
+---
+
+## What the data told us
+
+<p align="center">
+  <img src="docs/assets/funnel.svg" width="100%" alt="Funnel: 63,707 responses, minus 1,433 with a missing sitting, 3,936 survey answers and 566 key-stage mismatches, leaves 57,772 scored, of which 45,989 are English and Maths">
+</p>
+
+- 🧩 **56 sittings are missing.** 1,433 answers point at sittings that don't exist, so they have no style, year group or deleted flag. They're **excluded** and flagged by a warning test. The pupils are real, so a next step could score them with an assumed style.
+- 🔁 **Repeated rows.** 4,493 answers (7%) repeat the same question in the same sitting at the same second, sometimes with different outcomes. The evidence says duplicates, not multi-mark questions: `total_questions` counts each question once in 709 of 749 affected sittings. **All rows are kept**: we can't tell which copy is real, and keeping all of them is neutral on average. This is worth raising with the platform team.
+- ✅ **What's clean:** keys are unique with no nulls, there are no soft deletes, and every question belongs to exactly one subject.
+
+Full log with every number: [`analyses/FINDINGS.md`](analyses/FINDINGS.md).
+
+---
+
+## Results
+
+<p align="center">
+  <img src="docs/assets/results.svg" width="100%" alt="Box plots of current scaled scores: English KS1 median 99, English KS2 101, Maths KS1 98, Maths KS2 101; 50%, 65%, 40% and 60% meet the expected standard">
+</p>
+
+- **45 dbt tests pass** (plus 1 expected warning for the missing sittings).
+- **Re-runnable:** row counts and checksums are identical after a full refresh and an incremental run.
+- **Hand-checked:** four scores recomputed straight from the raw data match the model exactly.
+
+
+---
+
+## Predicting GCSE grades
+
+<p align="center">
+  <img src="docs/assets/gcse.svg" width="100%" alt="Illustrative diagram: scaled-score trajectory, % correct in other subjects, engagement and context feed a model trained on linked GCSE outcomes, which outputs a probability for each grade 1 to 9">
+</p>
+
+*Brief, step 3: how might we predict a pupil's GCSE results from their primary-school work, and
+what would we need: data, assumptions and why.*
+
+**The model.** I'd treat it as one prediction per GCSE subject: the probability of each grade 1–9.
+Gradient-boosted trees (**XGBoost** and **LightGBM**, compared on the same folds) suit this well.
+They handle missing years and non-linear effects natively, work on a few thousand pupils, and their
+predicted probabilities can be calibrated. A national baseline (below) is the benchmark they must
+beat.
+
+**The features**: one row per pupil, built from the tables in this repo:
+
+| pupil_id | y1_maths_scaled | y1_english_scaled | … | y6_maths_scaled | y6_english_scaled | y5_vr_pct | y5_nvr_pct | screeners_pct | answers_per_week | skip_rate | … |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| p_001 | 101 | 98 | … | 106 | 103 | 72 | 64 | 58 | 41 | 0.03 | … |
+
+- **Scaled score and % correct per subject per year group** (Year 1 → Year 6, every subject). This captures the *trajectory* as well as the level, which is why the build scores each year group separately.
+- **Aptitude**: Verbal / Non-Verbal Reasoning and Screeners, which SATs don't measure.
+- **Engagement**: volume, consistency, skip rate and time per question.
+- **Context**, used carefully: school and area deprivation help, but can encode disadvantage rather than ability, so they're also used to check the model is fair across groups.
+
+**The data we'd need, and the catch.** The target is real GCSE results, and a Year 6 pupil sits
+GCSEs five years later. So:
+
+1. **Ideally: Atom's own longitudinal data.** Pupils followed from Year 1 (or as early as we have) through to their GCSE results, linked by consent or by surveying families. That means years of history before the first model can be trained.
+2. **If we don't have that yet: use what exists.** The DfE's **KS2 → KS4 transition matrices** give the national GCSE grade distribution for each KS2 scaled-score band, so our Year 6 scores can be mapped onto them for a defensible first prediction with no Atom outcomes at all. National KS2 results show whether Atom pupils are typical. A **National Pupil Database** application gives pupil-level KS2 → GCSE histories to train on.
+
+**Assumptions, and why they matter**
+
+- **Our scores mean the same over time and match real SATs.** The national matrices are keyed on real KS2 scaled scores, so the mapping only holds if ours are comparable. That's the reason for using the official STA tables rather than a home-made scale.
+- **Past cohorts resemble future ones**, and the KS2 → GCSE relationship is stable. Grading changes and COVID break this: KS2 tests were cancelled in 2020 and 2021, so DfE can't calculate Progress 8 for 2024/25 or 2025/26, and those cohorts can't be used to learn the link.
+- **Atom users may not be representative.** They're self-selected, often motivated families, so a national baseline needs recalibrating to the platform.
+- **Five years is a long time.** The output should be a **grade distribution** (e.g. "70% chance of a 6 or above"), not a single grade, refreshed as new answers arrive.
+
+**Most relevant public data**
+
+| Dataset | Use | Source |
+|---|---|---|
+| KS2 → KS4 transition matrices (GCSE subjects) | National grade distribution by KS2 score band and subject: the baseline | [Explore education statistics](https://explore-education-statistics.service.gov.uk/data-catalogue/data-set/a317ce4a-07cc-4090-9d88-cd4c47527058) |
+| Key stage 4 performance | GCSE outcomes nationally and by school | [Explore education statistics](https://explore-education-statistics.service.gov.uk/find-statistics/key-stage-4-performance) |
+| KS2 attainment | National scaled-score distribution, to calibrate Atom pupils | [Explore education statistics](https://explore-education-statistics.service.gov.uk/find-statistics/key-stage-2-attainment-national-headlines) |
+| National Pupil Database | Linked pupil-level KS2 → GCSE results to train on, by application | [Apply for DfE data](https://www.gov.uk/guidance/apply-for-department-for-education-dfe-personal-data) |
+
+---
+
+## Limitations and next steps
+
+- **Score the 1,196 English / Maths answers whose sitting is missing**, using an assumed style.
+- **Confirm the repeated rows** with the platform team; if they're duplicates, de-duplicate at source.
+- **Whole-percent lookup** can be about 1 point low near a boundary on KS2 Maths (1% ≈ 1.1 marks); 0.1% steps would be a one-number change.
+- **Incremental edge cases:** a pupil deleted after their answers were loaded, or data arriving more than 3 days late, is only picked up by a full refresh. There's no load timestamp, so a scheduled full refresh is the production answer.
+- **Partition the raw `responses` table** on `answered_at` so each run reads only recent days (it scans about 10 MB today).
+- **Snapshot `course_hierarchy`** (it has no history), add topic names to split English into reading and GPS, and consider IRT difficulty calibration, which would let adaptive sittings be scored.
+
+---
+
+<details>
+<summary><b>🛠️ Running it locally</b></summary>
+<br>
+
 Requires [uv](https://docs.astral.sh/uv/) and the gcloud CLI.
 
 ```sh
-uv sync                                     # Python 3.12 + pinned dbt-core 1.12 / dbt-bigquery 1.12 (uv.lock)
-gcloud auth application-default login       # OAuth for BigQuery
+uv sync                                          # Python 3.12 + pinned dbt-core / dbt-bigquery
+gcloud auth application-default login            # OAuth for BigQuery
 uv run dbt deps
-uv run dbt debug                            # needs ~/.dbt/profiles.yml, below
-uv run dbt build
-uv run dbt build --vars '{as_at: "2026-03-01"}'   # point-in-time run
-uv run sqlfluff lint models tests analyses        # SQL style (fix: sqlfluff fix ...)
+uv run dbt build                                 # needs ~/.dbt/profiles.yml, below
+uv run dbt build --vars '{as_at: "2026-03-01"}'  # point-in-time run
+uv run sqlfluff lint models tests analyses       # SQL style (fix: sqlfluff fix ...)
 ```
 
 `~/.dbt/profiles.yml` (not committed):
@@ -36,211 +236,69 @@ atom_ks2:
       job_execution_timeout_seconds: 300
 ```
 
-**Updating the conversion tables** (STA publishes KS1 in June, KS2 in July):
-`uv run python scripts/build_conversion_seed.py <ks1|ks2> <year>` fetches the tables from the
-GOV.UK Content API, checks them, writes `seeds/scaled_scores/seed_scaled_scores_<ks>_<year>.csv`
-and regenerates `models/staging/stg_scaled_score_conversion.sql` (a union of every table).
-Then `uv run dbt build`.
+**New conversion tables** (STA publishes KS1 in June, KS2 in July):
 
-## Outputs
-All in `atom-analytics-candidates.james_oakley`.
-
-```
-de_raw.* ──► stg_* views ──┬──────────────────────────► trf_pupil_subject_daily (incremental)
-                           └► trf_assessment_key_stage ──┘          │
-STA KS1 + KS2 seeds ► stg_scaled_score_conversion                    ▼
-   └► trf_percent_to_scaled_score (lookup) ──────► pupil_subject_year_scores ► pupil_subject_sats_scores
+```sh
+uv run python scripts/build_conversion_seed.py ks2 2027   # fetch, validate, write the seed
+uv run dbt build
 ```
 
-| model | layer | grain | built as |
-|---|---|---|---|
-| `pupil_subject_sats_scores` | ready | **pupil × subject** (the app table): the latest year group's score; key `(pupil_id, subject_name)` | table |
-| `pupil_subject_year_scores` | ready | pupil × subject × year group; key `(pupil_id, subject_name, year_group)` | table |
-| `trf_percent_to_scaled_score` | transform | key stage × conversion year × subject × whole percent (0–100) | table |
-| `trf_assessment_key_stage` | transform | assessment: the key stage it's mainly sat by | table |
-| `trf_pupil_subject_daily` | transform | pupil × subject × key stage × year group × day (in-scope responses only) | incremental, `insert_overwrite` of the last 3 days |
-| `stg_*` | staging | the source tables (only the columns used); the conversion seeds unioned | views |
+**Profiling and verification queries:**
 
-Columns of `pupil_subject_sats_scores`: `pupil_id`, `subject_name`, `key_stage` and `year_group`
-(what the score is for), `scaled_score` (Maths and English only: KS1 85–115, KS2 80–120; null
-otherwise),
-`percent_correct`, `n_answered`, `n_correct`, `conversion_table_year`, `last_answered_date`.
-A pupil has a row only for subjects they've answered something in; **no row = no score yet**.
-A scaled score of 100 or more meets the expected standard. `pupil_subject_year_scores` has the
-same columns for every year group, not just the latest.
+```sh
+uv run python scripts/run_analyses.py            # dry run: GB per query
+uv run python scripts/run_analyses.py --run 29 30 31 32
+```
 
-## How a score is calculated
-1. **Scope.** A response counts when its sitting exists and isn't deleted, its pupil isn't deleted,
-   the sitting style is `fixed_question` or `non_adaptive` (adaptive tunes difficulty to the
-   pupil, so % correct stops measuring ability; surveys have no right answers), and **the pupil's
-   key stage at the sitting matches the assessment's**. Each assessment's key stage is the one
-   most of its sittings are in (tie = KS2; `trf_assessment_key_stage`), so a KS1 pupil's go at a
-   KS2 assessment isn't scored, nor a KS2 pupil's go at a KS1 one.
-2. **Add up per year group.** For each pupil × subject × year group (of the sitting), add up every
-   response up to the as-at date: `percent_correct = 100 × n_correct / n_answered`. A skipped
-   question counts as answered and wrong, as on a real paper.
-3. **Look up the scaled score** (Maths and English only) in `trf_percent_to_scaled_score`, on
-   - the pupil's **key stage** at the sitting (KS1 = Years 1–2, KS2 = 3–6): KS1 uses the KS1
-     tables (85–115), KS2 the KS2 tables (80–120);
-   - the **academic year** (Sep–Aug) of the pupil's latest response in that year group: Sep 2025 –
-     Aug 2026 uses the 2025 tables, which STA published in June / July 2025. Calendar year would
-     need the 2026 tables from January 2026, months before they exist, and would silently change
-     old scores when they arrived;
-   - the subject;
-   - `percent_correct` rounded down to a whole percent.
-4. **The lookup** is built once from the official STA tables (KS1 and KS2, 2024–2026): for each
-   percent, the equivalent raw mark on each test is `floor(percent × full marks / 100)` (marks are
-   earned, so round down), converted with the official table. English averages its reading and
-   GPS scores at both key stages (`seeds/seed_subject_to_test.csv`). Raw marks 0–2 have no
-   official score and count as the bottom of the scale (KS1 85, KS2 80).
-5. **The app table** keeps, for each pupil × subject, the latest year group's row.
+**README images** are generated from the seeds and verified numbers:
+`uv run python scripts/make_readme_assets.py`.
+</details>
 
-Atom's assessments are shorter than real papers, which is why scoring goes through a percentage
-rather than looking up a raw total. The percentage isn't mapped straight onto the scale because
-the official curve isn't linear: 90% in KS2 Maths (99/110) scores 112 on the 2025 table, a
-straight line gives 116.
+<details>
+<summary><b>📋 Output tables and columns</b></summary>
+<br>
 
-## Scope and subject decisions
-| subject | treatment | why |
+All tables are in `atom-analytics-candidates.james_oakley`.
+
+| model | grain | key |
 |---|---|---|
-| Maths | scaled score + % | direct KS2 test |
-| English | scaled score (½ reading + ½ GPS) + % | Atom's English covers both; topic names aren't available to split it |
-| Screeners | % only | diagnostic checks, not a curriculum subject; no KS2 test (17% of responses) |
-| Verbal / Non-Verbal Reasoning | % only | 11+ aptitude, not KS2 curriculum |
-| **Science** | **not included (for now)** | 335 questions in the hierarchy but **no responses**; not a SATs test. Rows appear automatically once responses exist (% correct); a seed row would give it a scaled score |
-| Wellbeing | not included | surveys only, no right answers |
+| `pupil_subject_sats_scores` | pupil × subject (latest year group): **the app table** | `(pupil_id, subject_name)` |
+| `pupil_subject_year_scores` | pupil × subject × year group | `(pupil_id, subject_name, year_group)` |
+| `trf_percent_to_scaled_score` | key stage × table year × subject × whole percent | |
+| `trf_assessment_key_stage` | assessment | `assessment_id` |
+| `trf_pupil_subject_daily` | pupil × subject × year group × day (incremental) | |
 
-## Assumptions and design trade-offs
-- **Each key stage on its own scale.** KS1 pupils (Years 1–2) are scored on the official KS1
-  tables (85–115), KS2 pupils on the KS2 tables (80–120), so `key_stage` must be shown alongside
-  the score: a KS1 100 and a KS2 100 both mean "expected standard" but aren't the same score.
-  KS1 tests have been optional since 2024, but STA still publishes their tables. A Year 3–4 score
-  is still on the KS2 curve, so it's an "on track for KS2" measure, not SATs attainment.
-- **Assessment key stage by majority.** An assessment's key stage is where most of its sittings
-  are (tie = KS2, the harder content). Responses from pupils in the other key stage are dropped,
-  so a KS1 pupil stretching to KS2 work, or a KS2 pupil revising KS1 work, doesn't distort their
-  score. See `analyses/32_key_stage_mismatch.sql` for how many responses this removes.
-- **Each year group is scored separately**, so a Year 5 score isn't diluted by Year 2 work. The
-  flip side: early in a new school year the current score rests on few responses (in Sep 2026, 26
-  pupils had only that month's work). `n_answered` is in the output so the app can judge it.
-- **Whole-percent lookup.** Simple to read and join, but coarser than raw marks on Maths (1% ≈ 1.1
-  marks), so a score can be about 1 point lower near a boundary. For example the Year 2 Maths
-  pupil in the hand check gets raw 70 → 102 here, against raw 71 → 103 from an exact raw-mark
-  calculation. 0.1% steps would be a one-number change in two places.
-- **Long app table** (pupil × subject) rather than wide (a column per subject): a new subject is
-  new rows, not a schema change in the app database; queries like "all Maths scores" or "any
-  subject below 100" are a simple `WHERE`; the key `(pupil_id, subject_name)` indexes naturally.
-  The app pivots for a per-pupil dashboard, or a wide view can sit on top. Pupils with no
-  responses have no rows; the app joins from its own pupils table.
-- **Point-in-time is a rebuild,** not a history table: `--vars '{as_at: ...}'` adds up only
-  responses on or before that date. While an as-at build is loaded, the ready tables show that
-  date; rebuild without `as_at` to return to current. (An earlier version kept a day-by-day
-  `valid_from` / `valid_to` history; it was dropped for simplicity.)
-- **Re-runnable:** no `current_date()`; the one `row_number()` is ordered deterministically
-  (latest date, then highest year group); a full refresh and an incremental run give identical output.
+`pupil_subject_sats_scores` columns: `pupil_id`, `subject_name`, `key_stage`, `year_group`,
+`scaled_score` (Maths / English only; KS1 85–115, KS2 80–120), `percent_correct`, `n_answered`,
+`n_correct`, `conversion_table_year`, `last_answered_date`. A pupil with no answers in a subject
+has no row for it.
+</details>
 
-## Data quality log
-Full log with numbers: `analyses/FINDINGS.md`. The issues that affect scores:
+<details>
+<summary><b>📁 Repository layout</b></summary>
+<br>
 
-- **Responses whose sitting doesn't exist.** 1,433 responses (2.2%) reference 56 `session_id`s
-  missing from `assessment_sittings` (1,196 of them English / Maths, from 40 pupil-subject
-  combinations). **Excluded:** without the sitting there's no style, deleted flag or year group,
-  so the scope rules can't be applied. The pupils exist and have other valid sittings, so these
-  could be scored with an assumed style (next step). A `relationships` test warns on them.
-- **Repeated question rows within a sitting (identified, not fixed).** 4,493 rows (7.1%) repeat
-  a pupil × sitting × question with the same timestamp and question number, sometimes with
-  conflicting outcomes. The evidence points to duplicate events rather than multi-mark questions:
-  `total_questions` matches the distinct question count in 709 of 749 affected sittings, and
-  English / Maths questions repeat in some sittings but not others. **All rows are counted** (each
-  as one mark), since there's no way to tell which duplicate is real. This is neutral on average:
-  collapsing to the mean gives the same % correct, while "correct if any row is correct" would add
-  ≈ 0.8 points. Worth raising with the platform team.
-- **`responses.session_type` is always `MOCK_TEST`**, disagreeing with every sitting, so it isn't used.
-- **No soft-deleted pupils or sittings** today; the filters stay as a production guard.
-- **Science has questions but no responses**; Screeners have right / wrong answers and are never
-  mixed with other subjects (the planned reasons for excluding them didn't hold; they're excluded
-  from scaled scores because there's no KS2 test, not because of data quality).
+```
+models/
+  staging/     views over de_raw; stg_scaled_score_conversion (generated union of the seeds)
+  transform/   trf_pupil_subject_daily, trf_assessment_key_stage, trf_percent_to_scaled_score
+  ready/       pupil_subject_year_scores, pupil_subject_sats_scores
+seeds/         scaled_scores/ (STA KS1 + KS2 tables per year), seed_subject_to_test.csv
+tests/         singular tests (weights sum to 1, every Maths / English score finds a table)
+analyses/      32 profiling and verification queries + FINDINGS.md
+scripts/       build_conversion_seed.py, run_analyses.py, make_readme_assets.py
+docs/assets/   README illustrations (generated)
+ai/            planning log and saved GOV.UK source pages
+```
+</details>
 
-## Verification
-Run on 2026-10-22, after adding the KS1 tables and the key-stage match.
+<details>
+<summary><b>🤖 How AI was used</b></summary>
+<br>
 
-- **`dbt build --full-refresh`:** 45 tests pass; 1 expected warning (the 1,433 responses whose
-  sitting is missing).
-- **Re-runnable:** row counts and an order-independent checksum of each model
-  (`analyses/29_output_checksums.sql`) are identical after the full refresh and an incremental
-  run: 63,707 responses → 1,399 daily rows → 405 year scores → 399 app rows (pupil × subject).
-- **Key-stage match** (`analyses/32_key_stage_mismatch.sql`): 566 responses are dropped, 498 from
-  KS1 pupils on mainly-KS2 assessments (8 pupils) and 68 from KS2 pupils on mainly-KS1 assessments
-  (3 pupils). No assessment was tied.
-- **Hand check** (`analyses/30_hand_check.sql`): the current score is recomputed straight from
-  `de_raw` (including the key-stage match) for the most active KS1 and KS2 pupil in each subject;
-  all four match the model.
-
-  | subject | key stage | year | answered | correct | % | working (2025 tables) | score |
-  |---|---|---|---|---|---|---|---|
-  | English | KS1 | 2 | 181 | 157 | 86.7% | gps raw 34 → 109; reading raw 34 → 107 | 108 |
-  | English | KS2 | 5 | 322 | 144 | 44.7% | gps raw 30 → 98; reading raw 22 → 96 | 97 |
-  | Maths | KS1 | 2 | 144 | 93 | 64.6% | maths raw 38 → 101 | 101 |
-  | Maths | KS2 | 5 | 189 | 97 | 51.3% | maths raw 56 → 99 | 99 |
-- **As-at run:** checked on 2026-10-21 (`as_at: 2026-03-01` adds up only earlier responses, and a
-  rebuild without `as_at` restores the current tables); the mechanism hasn't changed since.
-- **Distribution** (`analyses/31_score_distribution.sql`, app table):
-
-  | subject | key stage | pupils | scaled score quartiles | meet expected (≥ 100) | avg % correct |
-  |---|---|---|---|---|---|
-  | English | KS1 | 48 | 85 / 96 / 99 / 102 / 115 | 50% | 57.9 |
-  | English | KS2 | 106 | 87 / 98 / 101 / 105 / 120 | 65% | 57.8 |
-  | Maths | KS1 | 48 | 92 / 96 / 98 / 100 / 110 | 40% | 55.6 |
-  | Maths | KS2 | 104 | 80 / 97 / 101 / 105 / 114 | 60% | 58.5 |
-  | Screeners | KS2 | 82 | — | — | 52.4 |
-  | Verbal Reasoning | KS2 | 8 | — | — | 46.3 |
-  | Non-Verbal Reasoning | KS2 | 3 | — | — | 63.9 |
-
-  KS1 pupils meet the expected standard less often on the KS1 tables than they did on the KS2
-  curve, because KS1 pupils' similar % correct sits lower on the KS1 curve.
-
-## Limitations and next steps
-- Score the 1,196 English / Maths responses whose sitting is missing, with an assumed style.
-- Confirm with the platform team whether repeated question rows are duplicates.
-- **Incremental and deletes:** a pupil or sitting soft-deleted *after* its responses were loaded
-  stays in `trf_pupil_subject_daily` until its day is recomputed (3-day lookback) or a
-  `--full-refresh`. A production version would full-refresh on a schedule.
-- **Late data older than the lookback** is missed until a full refresh; there's no load timestamp
-  to find it by. For the same reason there's no bitemporal "what did the app show on date X".
-- **The raw `responses` table isn't partitioned,** so each incremental run still scans it in full
-  (~10 MB now). Partitioning it on `answered_at` would let the staging view read only recent days.
-  Staging is a view rather than an incremental copy because, with the raw table unpartitioned,
-  a copy would scan the same data and add a second table to keep in step.
-- `course_hierarchy` has no validity dates: snapshot it from now on.
-- Topic names to split English into reading and GPS; 0.1% lookup steps;
-  recency weighting within a year group; IRT difficulty calibration (would let adaptive sittings be
-  scored, and Atom's questions aren't SATs questions).
-
-## Predicting GCSE grades
-**Target and features.** The target would be each pupil's GCSE grade (9–1) per subject. Features
-would start from this model's outputs: scaled scores per year group and their trajectory over
-time, % correct in the non-SATs subjects, and engagement (volume, consistency, time taken, skip
-rate). Topic-level strengths would add detail once topic names are available, and Verbal /
-Non-Verbal Reasoning are useful aptitude signals here even though they aren't SATs subjects.
-School context could help but needs care for fairness, since it can encode deprivation rather than
-ability.
-
-**Data needed.** The essential ingredient is **linked outcomes**: real GCSE results for past
-platform users. That means either five or more years of history (a Year 6 pupil sits GCSEs five
-years later) or a link to the National Pupil Database. The DfE's published KS2 → KS4 transition
-matrices are the baseline any model would need to beat, and could be used as a prior before Atom
-has its own outcomes.
-
-**Assumptions and output.** It would assume our scaled scores mean the same thing over time
-(stable tables, comparable questions), that past cohorts resemble future ones, and that the KS2 →
-KS4 relationship holds for platform users, who may not be representative. Given the five-year gap
-and how much happens in secondary school, the prediction should be reported as a **grade
-distribution** (for example "60% chance of grade 6 or above"), not a single grade, and refreshed as
-new evidence arrives.
-
-## AI usage
-This project was built with Claude Code. `ai/planning_log.md` records each decision and change of
-direction (dated, with the reason), `PLAN.md` and `CLAUDE.md` are the working plan and the
-conventions the AI followed, and `ai/sources/` holds the GOV.UK pages the conversion tables came
-from. Every AI-written query and model was checked against the data (`analyses/`), and the
-scoring was hand-checked from raw data.
+This project was built with Claude Code. [`ai/planning_log.md`](ai/planning_log.md) records every
+decision and change of direction with the date and the reason. [`PLAN.md`](PLAN.md) and
+[`CLAUDE.md`](CLAUDE.md) are the working plan and the conventions the AI followed, and
+`ai/sources/` holds the GOV.UK pages the conversion tables came from. Every query and model was
+checked against the data in `analyses/`, and the scoring was hand-checked from the raw tables.
+</details>

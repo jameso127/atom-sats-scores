@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" role="img">
+<style>
+  .t { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #15245e; }
+  .h { font-family: 'National B Condensed', 'Arial Narrow', 'Roboto Condensed', 'Segoe UI', sans-serif; font-weight: 800; fill: #15245e; }
+  .cap { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+</style>
+
+  <rect width="1200" height="420" rx="24" fill="#f3f8ff"/>
+  <text x="40" y="50" class="cap" font-size="15" font-weight="400" text-anchor="start" style="fill:#2986ff" >EACH ASSESSMENT GETS THE KEY STAGE MOST OF ITS SITTINGS ARE IN</text>
+  <rect x="40" y="80" width="520" height="250" rx="22" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+  <text x="64" y="120" class="h" font-size="24" font-weight="400" text-anchor="start" >Mainly-KS1 assessment</text>
+  <text x="64" y="146" class="t" font-size="15" font-weight="400" text-anchor="start" style="fill:#5d6c7b" >KS2 pupils' responses here aren't scored</text>
+  
+    <circle cx="94" cy="190" r="14" fill="#4fbf5e"/>
+    <circle cx="134" cy="190" r="14" fill="#4fbf5e"/>
+    <circle cx="174" cy="190" r="14" fill="#4fbf5e"/>
+    <g>
+      <circle cx="214" cy="190" r="14" fill="#2986ff" opacity="0.35"/>
+      <circle cx="214" cy="190" r="16" fill="none" stroke="#f75050" stroke-width="2">
+        <animate attributeName="r" values="14;22" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.9;0" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+      <path d="M 206 182 L 222 198 M 222 182 L 206 198" stroke="#f75050" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <g>
+      <circle cx="254" cy="190" r="14" fill="#2986ff" opacity="0.35"/>
+      <circle cx="254" cy="190" r="16" fill="none" stroke="#f75050" stroke-width="2">
+        <animate attributeName="r" values="14;22" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.9;0" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+      <path d="M 246 182 L 262 198 M 262 182 L 246 198" stroke="#f75050" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <circle cx="294" cy="190" r="14" fill="#4fbf5e"/>
+    <circle cx="334" cy="190" r="14" fill="#4fbf5e"/>
+    <g>
+      <circle cx="374" cy="190" r="14" fill="#2986ff" opacity="0.35"/>
+      <circle cx="374" cy="190" r="16" fill="none" stroke="#f75050" stroke-width="2">
+        <animate attributeName="r" values="14;22" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.9;0" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+      <path d="M 366 182 L 382 198 M 382 182 L 366 198" stroke="#f75050" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <circle cx="414" cy="190" r="14" fill="#4fbf5e"/>
+    <circle cx="94" cy="230" r="14" fill="#4fbf5e"/>
+    <circle cx="134" cy="230" r="14" fill="#4fbf5e"/>
+    <circle cx="174" cy="230" r="14" fill="#4fbf5e"/>
+    <circle cx="214" cy="230" r="14" fill="#4fbf5e"/>
+    <circle cx="254" cy="230" r="14" fill="#4fbf5e"/>
+    <circle cx="294" cy="230" r="14" fill="#4fbf5e"/>
+    <circle cx="334" cy="230" r="14" fill="#4fbf5e"/>
+    <circle cx="374" cy="230" r="14" fill="#4fbf5e"/>
+    <circle cx="414" cy="230" r="14" fill="#4fbf5e"/>
+    <circle cx="94" cy="270" r="14" fill="#4fbf5e"/>
+    <circle cx="134" cy="270" r="14" fill="#4fbf5e"/>
+    <circle cx="174" cy="270" r="14" fill="#4fbf5e"/>
+    <circle cx="214" cy="270" r="14" fill="#4fbf5e"/>
+    <circle cx="254" cy="270" r="14" fill="#4fbf5e"/>
+    <circle cx="294" cy="270" r="14" fill="#4fbf5e"/>
+    <circle cx="334" cy="270" r="14" fill="#4fbf5e"/>
+  <rect x="640" y="80" width="520" height="250" rx="22" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+  <text x="664" y="120" class="h" font-size="24" font-weight="400" text-anchor="start" >Mainly-KS2 assessment</text>
+  <text x="664" y="146" class="t" font-size="15" font-weight="400" text-anchor="start" style="fill:#5d6c7b" >KS1 pupils' responses here aren't scored</text>
+  
+    <circle cx="694" cy="190" r="14" fill="#2986ff"/>
+    <circle cx="734" cy="190" r="14" fill="#2986ff"/>
+    <circle cx="774" cy="190" r="14" fill="#2986ff"/>
+    <circle cx="814" cy="190" r="14" fill="#2986ff"/>
+    <circle cx="854" cy="190" r="14" fill="#2986ff"/>
+    <circle cx="894" cy="190" r="14" fill="#2986ff"/>
+    <circle cx="934" cy="190" r="14" fill="#2986ff"/>
+    <circle cx="974" cy="190" r="14" fill="#2986ff"/>
+    <circle cx="1014" cy="190" r="14" fill="#2986ff"/>
+    <circle cx="694" cy="230" r="14" fill="#2986ff"/>
+    <circle cx="734" cy="230" r="14" fill="#2986ff"/>
+    <circle cx="774" cy="230" r="14" fill="#2986ff"/>
+    <circle cx="814" cy="230" r="14" fill="#2986ff"/>
+    <circle cx="854" cy="230" r="14" fill="#2986ff"/>
+    <circle cx="894" cy="230" r="14" fill="#2986ff"/>
+    <g>
+      <circle cx="934" cy="230" r="14" fill="#4fbf5e" opacity="0.35"/>
+      <circle cx="934" cy="230" r="16" fill="none" stroke="#f75050" stroke-width="2">
+        <animate attributeName="r" values="14;22" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.9;0" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+      <path d="M 926 222 L 942 238 M 942 222 L 926 238" stroke="#f75050" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <g>
+      <circle cx="974" cy="230" r="14" fill="#4fbf5e" opacity="0.35"/>
+      <circle cx="974" cy="230" r="16" fill="none" stroke="#f75050" stroke-width="2">
+        <animate attributeName="r" values="14;22" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.9;0" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+      <path d="M 966 222 L 982 238 M 982 222 L 966 238" stroke="#f75050" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <circle cx="1014" cy="230" r="14" fill="#2986ff"/>
+    <circle cx="694" cy="270" r="14" fill="#2986ff"/>
+    <circle cx="734" cy="270" r="14" fill="#2986ff"/>
+    <circle cx="774" cy="270" r="14" fill="#2986ff"/>
+    <circle cx="814" cy="270" r="14" fill="#2986ff"/>
+    <g>
+      <circle cx="854" cy="270" r="14" fill="#4fbf5e" opacity="0.35"/>
+      <circle cx="854" cy="270" r="16" fill="none" stroke="#f75050" stroke-width="2">
+        <animate attributeName="r" values="14;22" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.9;0" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+      <path d="M 846 262 L 862 278 M 862 262 L 846 278" stroke="#f75050" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <circle cx="894" cy="270" r="14" fill="#2986ff"/>
+    <circle cx="934" cy="270" r="14" fill="#2986ff"/>
+  <circle cx="60" cy="372" r="11" fill="#4fbf5e"/><text x="80" y="378" class="t" font-size="16" font-weight="700" text-anchor="start" >KS1 pupil (Years 1–2)</text>
+  <circle cx="300" cy="372" r="11" fill="#2986ff"/><text x="320" y="378" class="t" font-size="16" font-weight="700" text-anchor="start" >KS2 pupil (Years 3–6)</text>
+  <text x="1160" y="378" class="t" font-size="16" font-weight="700" text-anchor="end" style="fill:#f75050" >566 responses dropped · 1.2% of English &amp; Maths · no ties</text>
+</svg>

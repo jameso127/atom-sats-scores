@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400" role="img">
+<style>
+  .t { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #15245e; }
+  .h { font-family: 'National B Condensed', 'Arial Narrow', 'Roboto Condensed', 'Segoe UI', sans-serif; font-weight: 800; fill: #15245e; }
+  .cap { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+</style>
+<rect width="1200" height="400" rx="24" fill="#f3f8ff"/><text x="40" y="50" class="cap" font-size="15" font-weight="400" text-anchor="start" style="fill:#2986ff" >ILLUSTRATIVE: FROM SCORES TO A GCSE GRADE DISTRIBUTION</text>
+  <rect x="40" y="78" width="330" height="60" rx="14" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+  <rect x="40" y="78" width="8" height="60" rx="4" fill="#2986ff"/>
+  <text x="62" y="104" class="t" font-size="17" font-weight="700" text-anchor="start" >Scores, Year 1 → Year 6</text>
+  <text x="62" y="125" class="t" font-size="14" font-weight="400" text-anchor="start" style="fill:#5d6c7b" >scaled score + % per subject</text>
+  <path d="M 370 108 C 420 108, 430 200, 480 200" fill="none" stroke="#99c9ff" stroke-width="2.5"/>
+  <circle r="5" fill="#2986ff"><animateMotion dur="2.2s" begin="0.0s" repeatCount="indefinite" path="M 370 108 C 420 108, 430 200, 480 200"/></circle>
+  <rect x="40" y="152" width="330" height="60" rx="14" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+  <rect x="40" y="152" width="8" height="60" rx="4" fill="#2986ff"/>
+  <text x="62" y="178" class="t" font-size="17" font-weight="700" text-anchor="start" >% correct elsewhere</text>
+  <text x="62" y="199" class="t" font-size="14" font-weight="400" text-anchor="start" style="fill:#5d6c7b" >Screeners, VR / NVR aptitude</text>
+  <path d="M 370 182 C 420 182, 430 200, 480 200" fill="none" stroke="#99c9ff" stroke-width="2.5"/>
+  <circle r="5" fill="#2986ff"><animateMotion dur="2.2s" begin="0.4s" repeatCount="indefinite" path="M 370 182 C 420 182, 430 200, 480 200"/></circle>
+  <rect x="40" y="226" width="330" height="60" rx="14" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+  <rect x="40" y="226" width="8" height="60" rx="4" fill="#4fbf5e"/>
+  <text x="62" y="252" class="t" font-size="17" font-weight="700" text-anchor="start" >Engagement</text>
+  <text x="62" y="273" class="t" font-size="14" font-weight="400" text-anchor="start" style="fill:#5d6c7b" >volume, consistency, skips, time</text>
+  <path d="M 370 256 C 420 256, 430 200, 480 200" fill="none" stroke="#99c9ff" stroke-width="2.5"/>
+  <circle r="5" fill="#4fbf5e"><animateMotion dur="2.2s" begin="0.8s" repeatCount="indefinite" path="M 370 256 C 420 256, 430 200, 480 200"/></circle>
+  <rect x="40" y="300" width="330" height="60" rx="14" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+  <rect x="40" y="300" width="8" height="60" rx="4" fill="#ffb61a"/>
+  <text x="62" y="326" class="t" font-size="17" font-weight="700" text-anchor="start" >Context (with care)</text>
+  <text x="62" y="347" class="t" font-size="14" font-weight="400" text-anchor="start" style="fill:#5d6c7b" >school, deprivation (IDACI)</text>
+  <path d="M 370 330 C 420 330, 430 200, 480 200" fill="none" stroke="#99c9ff" stroke-width="2.5"/>
+  <circle r="5" fill="#ffb61a"><animateMotion dur="2.2s" begin="1.2000000000000002s" repeatCount="indefinite" path="M 370 330 C 420 330, 430 200, 480 200"/></circle>
+  <rect x="480" y="140" width="230" height="120" rx="22" fill="#2986ff" stroke="#2986ff" stroke-width="2" />
+  <text x="595" y="182" class="h" font-size="28" font-weight="400" text-anchor="middle" style="fill:#ffffff" >XGBoost</text>
+  <text x="595" y="210" class="t" font-size="18" font-weight="700" text-anchor="middle" style="fill:#ffffff" >· LightGBM ·</text>
+  <text x="595" y="238" class="t" font-size="15" font-weight="400" text-anchor="middle" style="fill:#e5f1ff" >per GCSE subject</text>
+  <path d="M 710 200 L 770 200" stroke="#99c9ff" stroke-width="3"/><path d="M 762 192 l 8 8 l -8 8" fill="none" stroke="#99c9ff" stroke-width="3"/>
+  <rect x="780" y="70" width="380" height="290" rx="22" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+  <text x="800" y="104" class="t" font-size="15" font-weight="700" text-anchor="start" >P(grade) for one pupil, GCSE Maths</text>
+  <rect x="806" y="314" width="26" height="6" rx="6" fill="#99c9ff">
+    <animate attributeName="height" from="0" to="6" begin="0.15s" dur="0.8s" fill="freeze"/>
+    <animate attributeName="y" from="320" to="314" begin="0.15s" dur="0.8s" fill="freeze"/>
+  </rect>
+  <text x="819" y="344" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >1</text>
+  <rect x="844" y="307" width="26" height="13" rx="6" fill="#99c9ff">
+    <animate attributeName="height" from="0" to="13" begin="0.3s" dur="0.8s" fill="freeze"/>
+    <animate attributeName="y" from="320" to="307" begin="0.3s" dur="0.8s" fill="freeze"/>
+  </rect>
+  <text x="857" y="344" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >2</text>
+  <rect x="882" y="294" width="26" height="26" rx="6" fill="#99c9ff">
+    <animate attributeName="height" from="0" to="26" begin="0.44999999999999996s" dur="0.8s" fill="freeze"/>
+    <animate attributeName="y" from="320" to="294" begin="0.44999999999999996s" dur="0.8s" fill="freeze"/>
+  </rect>
+  <text x="895" y="344" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >3</text>
+  <rect x="920" y="262" width="26" height="58" rx="6" fill="#4fbf5e">
+    <animate attributeName="height" from="0" to="58" begin="0.6s" dur="0.8s" fill="freeze"/>
+    <animate attributeName="y" from="320" to="262" begin="0.6s" dur="0.8s" fill="freeze"/>
+  </rect>
+  <text x="933" y="344" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >4</text>
+  <rect x="958" y="211" width="26" height="109" rx="6" fill="#4fbf5e">
+    <animate attributeName="height" from="0" to="109" begin="0.75s" dur="0.8s" fill="freeze"/>
+    <animate attributeName="y" from="320" to="211" begin="0.75s" dur="0.8s" fill="freeze"/>
+  </rect>
+  <text x="971" y="344" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >5</text>
+  <rect x="996" y="166" width="26" height="154" rx="6" fill="#4fbf5e">
+    <animate attributeName="height" from="0" to="154" begin="0.8999999999999999s" dur="0.8s" fill="freeze"/>
+    <animate attributeName="y" from="320" to="166" begin="0.8999999999999999s" dur="0.8s" fill="freeze"/>
+  </rect>
+  <text x="1009" y="344" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >6</text>
+  <rect x="1034" y="179" width="26" height="141" rx="6" fill="#4fbf5e">
+    <animate attributeName="height" from="0" to="141" begin="1.05s" dur="0.8s" fill="freeze"/>
+    <animate attributeName="y" from="320" to="179" begin="1.05s" dur="0.8s" fill="freeze"/>
+  </rect>
+  <text x="1047" y="344" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >7</text>
+  <rect x="1072" y="230" width="26" height="90" rx="6" fill="#4fbf5e">
+    <animate attributeName="height" from="0" to="90" begin="1.2s" dur="0.8s" fill="freeze"/>
+    <animate attributeName="y" from="320" to="230" begin="1.2s" dur="0.8s" fill="freeze"/>
+  </rect>
+  <text x="1085" y="344" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >8</text>
+  <rect x="1110" y="275" width="26" height="45" rx="6" fill="#4fbf5e">
+    <animate attributeName="height" from="0" to="45" begin="1.3499999999999999s" dur="0.8s" fill="freeze"/>
+    <animate attributeName="y" from="320" to="275" begin="1.3499999999999999s" dur="0.8s" fill="freeze"/>
+  </rect>
+  <text x="1123" y="344" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >9</text><text x="800" y="130" class="t" font-size="16" font-weight="700" text-anchor="start" style="fill:#4fbf5e" >P(grade 4 or above) = 93%</text>
+</svg>

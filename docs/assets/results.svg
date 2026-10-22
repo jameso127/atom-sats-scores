@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 430" width="1200" height="430" role="img">
+<style>
+  .t { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #15245e; }
+  .h { font-family: 'National B Condensed', 'Arial Narrow', 'Roboto Condensed', 'Segoe UI', sans-serif; font-weight: 800; fill: #15245e; }
+  .cap { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+</style>
+<rect width="1200" height="430" rx="24" fill="#ffffff" stroke="#e5f1ff" stroke-width="2"/><text x="40" y="50" class="cap" font-size="15" font-weight="400" text-anchor="start" style="fill:#2986ff" >CURRENT SCALED SCORES (MIN · QUARTILES · MAX)</text><text x="1160" y="50" class="cap" font-size="13" font-weight="400" text-anchor="end" style="fill:#5d6c7b" >MEET EXPECTED</text><line x1="260.0" y1="76" x2="260.0" y2="380" stroke="#e5f1ff" stroke-width="1.5"/><text x="260.0" y="404" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >80</text><line x1="435.0" y1="76" x2="435.0" y2="380" stroke="#e5f1ff" stroke-width="1.5"/><text x="435.0" y="404" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >90</text><line x1="610.0" y1="76" x2="610.0" y2="380" stroke="#e5f1ff" stroke-width="1.5"/><text x="610.0" y="404" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >100</text><line x1="785.0" y1="76" x2="785.0" y2="380" stroke="#e5f1ff" stroke-width="1.5"/><text x="785.0" y="404" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >110</text><line x1="960.0" y1="76" x2="960.0" y2="380" stroke="#e5f1ff" stroke-width="1.5"/><text x="960.0" y="404" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >120</text><line x1="610.0" y1="70" x2="610.0" y2="384" stroke="#ffb61a" stroke-width="2.5" stroke-dasharray="7 6"/>
+  <text x="40" y="110" class="t" font-size="18" font-weight="700" text-anchor="start" >English · KS1</text>
+  <text x="40" y="132" class="t" font-size="14" font-weight="400" text-anchor="start" style="fill:#5d6c7b" >48 pupils</text>
+  <rect x="347.5" y="82" width="525.0" height="44" rx="10" fill="#f3f8ff"/>
+  <g opacity="0">
+    <line x1="347.5" y1="104" x2="872.5" y2="104" stroke="#4fbf5e" stroke-width="3"/>
+    <rect x="540.0" y="90" width="105.0" height="28" rx="7" fill="#4fbf5e" opacity="0.85"/>
+    <line x1="592.5" y1="86" x2="592.5" y2="122" stroke="#15245e" stroke-width="4"/>
+    <text x="592.5" y="80" class="t" font-size="14" font-weight="700" text-anchor="middle" >99</text>
+    <animate attributeName="opacity" from="0" to="1" begin="0.0s" dur="0.7s" fill="freeze"/>
+  </g>
+  <rect x="1010" y="94" width="150" height="20" rx="10" fill="#e5f1ff"/>
+  <rect x="1010" y="94" width="0" height="20" rx="10" fill="#4fbf5e">
+    <animate attributeName="width" from="0" to="75" begin="0.4s" dur="0.9s" fill="freeze"/>
+  </rect>
+  <text x="1085" y="140" class="t" font-size="14" font-weight="700" text-anchor="middle" style="fill:#4fbf5e" >50%</text>
+  <text x="40" y="182" class="t" font-size="18" font-weight="700" text-anchor="start" >English · KS2</text>
+  <text x="40" y="204" class="t" font-size="14" font-weight="400" text-anchor="start" style="fill:#5d6c7b" >106 pupils</text>
+  <rect x="260.0" y="154" width="700.0" height="44" rx="10" fill="#f3f8ff"/>
+  <g opacity="0">
+    <line x1="382.5" y1="176" x2="960.0" y2="176" stroke="#2986ff" stroke-width="3"/>
+    <rect x="575.0" y="162" width="122.5" height="28" rx="7" fill="#2986ff" opacity="0.85"/>
+    <line x1="627.5" y1="158" x2="627.5" y2="194" stroke="#15245e" stroke-width="4"/>
+    <text x="627.5" y="152" class="t" font-size="14" font-weight="700" text-anchor="middle" >101</text>
+    <animate attributeName="opacity" from="0" to="1" begin="0.3s" dur="0.7s" fill="freeze"/>
+  </g>
+  <rect x="1010" y="166" width="150" height="20" rx="10" fill="#e5f1ff"/>
+  <rect x="1010" y="166" width="0" height="20" rx="10" fill="#2986ff">
+    <animate attributeName="width" from="0" to="98" begin="0.7s" dur="0.9s" fill="freeze"/>
+  </rect>
+  <text x="1085" y="212" class="t" font-size="14" font-weight="700" text-anchor="middle" style="fill:#2986ff" >65%</text>
+  <text x="40" y="254" class="t" font-size="18" font-weight="700" text-anchor="start" >Maths · KS1</text>
+  <text x="40" y="276" class="t" font-size="14" font-weight="400" text-anchor="start" style="fill:#5d6c7b" >48 pupils</text>
+  <rect x="347.5" y="226" width="525.0" height="44" rx="10" fill="#f3f8ff"/>
+  <g opacity="0">
+    <line x1="470.0" y1="248" x2="785.0" y2="248" stroke="#4fbf5e" stroke-width="3"/>
+    <rect x="540.0" y="234" width="70.0" height="28" rx="7" fill="#4fbf5e" opacity="0.85"/>
+    <line x1="575.0" y1="230" x2="575.0" y2="266" stroke="#15245e" stroke-width="4"/>
+    <text x="575.0" y="224" class="t" font-size="14" font-weight="700" text-anchor="middle" >98</text>
+    <animate attributeName="opacity" from="0" to="1" begin="0.6s" dur="0.7s" fill="freeze"/>
+  </g>
+  <rect x="1010" y="238" width="150" height="20" rx="10" fill="#e5f1ff"/>
+  <rect x="1010" y="238" width="0" height="20" rx="10" fill="#4fbf5e">
+    <animate attributeName="width" from="0" to="60" begin="1.0s" dur="0.9s" fill="freeze"/>
+  </rect>
+  <text x="1085" y="284" class="t" font-size="14" font-weight="700" text-anchor="middle" style="fill:#4fbf5e" >40%</text>
+  <text x="40" y="326" class="t" font-size="18" font-weight="700" text-anchor="start" >Maths · KS2</text>
+  <text x="40" y="348" class="t" font-size="14" font-weight="400" text-anchor="start" style="fill:#5d6c7b" >104 pupils</text>
+  <rect x="260.0" y="298" width="700.0" height="44" rx="10" fill="#f3f8ff"/>
+  <g opacity="0">
+    <line x1="260.0" y1="320" x2="855.0" y2="320" stroke="#2986ff" stroke-width="3"/>
+    <rect x="557.5" y="306" width="140.0" height="28" rx="7" fill="#2986ff" opacity="0.85"/>
+    <line x1="627.5" y1="302" x2="627.5" y2="338" stroke="#15245e" stroke-width="4"/>
+    <text x="627.5" y="296" class="t" font-size="14" font-weight="700" text-anchor="middle" >101</text>
+    <animate attributeName="opacity" from="0" to="1" begin="0.8999999999999999s" dur="0.7s" fill="freeze"/>
+  </g>
+  <rect x="1010" y="310" width="150" height="20" rx="10" fill="#e5f1ff"/>
+  <rect x="1010" y="310" width="0" height="20" rx="10" fill="#2986ff">
+    <animate attributeName="width" from="0" to="90" begin="1.2999999999999998s" dur="0.9s" fill="freeze"/>
+  </rect>
+  <text x="1085" y="356" class="t" font-size="14" font-weight="700" text-anchor="middle" style="fill:#2986ff" >60%</text><text x="260.0" y="424" class="t" font-size="13" font-weight="400" text-anchor="start" style="fill:#5d6c7b" >shaded band = the key stage's scale</text>
+</svg>
