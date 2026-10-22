@@ -32,9 +32,7 @@ WHERE
     sitting.style IN ('fixed_question', 'non_adaptive')
     AND sitting.key_stage = assess.key_stage
     {% if is_incremental() %}
-        AND resp.answered_date >= (
-            SELECT DATE_SUB(MAX(existing.answered_date), INTERVAL {{ var('lookback_days') }} DAY)
-            FROM {{ this }} AS existing
-        )
+        -- _dbt_max_partition: the table's latest answered_date, declared by dbt for insert_overwrite.
+        AND resp.answered_date >= DATE_SUB(_dbt_max_partition, INTERVAL {{ var('lookback_days') }} DAY)  -- noqa: RF02
     {% endif %}
 GROUP BY resp.pupil_id, question.subject_name, sitting.key_stage, sitting.year_group_at_sitting, resp.answered_date
