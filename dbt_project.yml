@@ -12,7 +12,7 @@ snapshot-paths: ["snapshots"]
 clean-targets: ["target", "dbt_packages"]
 
 vars:
-  # Point-in-time date (YYYY-MM-DD). null = the latest answered date in the data; never current_date().
+  # Point-in-time date (YYYY-MM-DD): only responses on or before it count. null = all data; never current_date().
   as_at: null
   # The incremental model recomputes this many recent days, to pick up late-arriving responses.
   lookback_days: 3

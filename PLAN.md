@@ -1,4 +1,4 @@
-# Plan: KS2 SATs scaled scores (≈2 hours)
+# Plan: SATs-style scaled scores (≈2 hours, KS1 added later)
 
 > AI planning doc, kept in the repo as submission evidence: **what to build and in what order**.
 > It has been kept in step with the code, but the reviewer-facing description of the final design
@@ -23,13 +23,14 @@ response from sittings in that year group up to the as-at date (scope rules in C
    as on a real paper. Repeated rows for one question in a sitting all count (each row is a mark);
    the README logs them as an identified issue (FINDINGS 25–28).
 2. Round it down to a whole percent and look it up in `trf_percent_to_scaled_score`: one row per
-   conversion year × subject × percent (0–100). The year is the academic year (Sep–Aug) of the
+   key stage × conversion year × subject × percent (0–100). The year is the academic year (Sep–Aug) of the
    pupil's latest response in that year group, so Sep 2025 – Aug 2026 uses the 2025 table,
-   published the July before. A test fails if a Maths / English score finds no lookup row.
-3. The lookup is built once from the conversion seeds: for each percent and each KS2 test the
-   subject maps to, equivalent raw mark = floor(percent × full marks / 100) (floor, because a raw
+   published the June / July before. A test fails if a Maths / English score finds no lookup row.
+3. The lookup is built once from the conversion seeds: for each percent and each test the
+   subject maps to (at the pupil's key stage), equivalent raw mark = floor(percent × full marks / 100) (floor, because a raw
    score counts marks earned), its official scaled score, then the weighted average
-   (English = half reading, half GPS), rounded. Raw 0–2 has no official score, so counts as 80.
+   (English = half reading, half GPS), rounded. Raw 0–2 has no official score, so counts as the
+   bottom of the scale (KS1 85, KS2 80).
    Whole percents are coarser than raw marks on Maths (1% ≈ 1.1 marks), so a score just below a
    percent boundary can be ~1 point lower than an exact raw-mark calculation; 0.1% steps would be a
    one-number change.
@@ -49,7 +50,7 @@ Why not map the percentage linearly onto 80–120? The official curve isn't line
 
 
 ## Subjects
-The data has seven subjects, but only three KS2 tests (maths, reading, GPS) have a scaled score.
+The data has seven subjects, but only three STA tests (maths, reading, GPS) have a scaled score.
 The mapping lives in `seeds/seed_subject_to_test.csv` (same at KS1 and KS2), so changing a
 decision is a seed edit.
 
@@ -58,10 +59,10 @@ decision is a seed edit.
 | Maths | official | maths 1.0 | A direct KS2 test |
 | English | official, blended | reading 0.5 + gps 0.5 | Atom describes SATs English as reading, spelling, vocabulary, grammar and punctuation. Topic names aren't available (6 topic IDs only), so we can't split it; blending uses both real curves |
 | Science | removed for now | none | No responses in the data, and not a SATs test. Re-add as a seed row if data arrives |
-| Verbal Reasoning | excluded | none | 11+ aptitude skill, not KS2 curriculum |
-| Non-Verbal Reasoning | excluded | none | Same |
-| Wellbeing | excluded | none | Not attainment |
-| Screeners | excluded | none | Diagnostic checks with no KS2 test (17% of responses) |
+| Verbal Reasoning | % correct only | none | 11+ aptitude skill, not KS2 curriculum |
+| Non-Verbal Reasoning | % correct only | none | Same |
+| Wellbeing | excluded | none | Surveys: no right answers |
+| Screeners | % correct only | none | Diagnostic checks with no KS2 test (17% of responses) |
 
 "Every subject" is read as every subject with a defensible SATs equivalent, which the README
 explains. Profiling didn't support the original evidence (Screeners have right/wrong answers and
@@ -73,12 +74,12 @@ single-subject sittings), so the exclusion rests on what they are: diagnostics, 
 de_raw.*  (source)
  └ stg_responses, stg_assessment_sittings, stg_pupils, stg_course_hierarchy     views
      only the columns used; drop is_deleted rows (pupils, sittings)
-seed_ks2_scaled_scores_<year>  (one per year)
+seed_scaled_scores_<ks1|ks2>_<year>  (one per key stage × year)
  └ stg_scaled_score_conversion               view; union all of the KS1 + KS2 seeds (generated)
 
 ── transform ──
  └ trf_assessment_key_stage                  table; each assessment's majority key stage
- └ trf_percent_to_scaled_score               table; conversion year × subject × percent (0-100)
+ └ trf_percent_to_scaled_score               table; key stage × conversion year × subject × percent (0-100)
      → scaled score (English blended); built from the seeds
  └ trf_pupil_subject_daily                   incremental, insert_overwrite by answered_date
      joins staging, applies the scope rules, pupil × subject × year group × day: n_answered,
@@ -110,7 +111,7 @@ conversion_table_year, last_answered_date`).
 **Tests** (only where they add something): unique / not_null on the staging keys; a warning for
 responses whose sitting is missing (a DQ finding); unique keys on every model that's joined or
 served; mapping seed weights in (0, 1] and summing to 1 per subject; every Maths / English score
-finds a conversion table; app table scaled scores in 80–120. The conversion seeds aren't
+finds a conversion table; app table scaled scores within their key stage's scale (KS1 85–115, KS2 80–120). The conversion seeds aren't
 re-tested in dbt beyond a unique key: the fetch script validates them before writing.
 
 ## Timeline
@@ -122,7 +123,7 @@ re-tested in dbt beyond a unique key: the fetch script validates them before wri
 | 0:35–0:55 | **Staging** ✅: sources yml + 4 views + tests | `dbt build -s staging` green |
 | 0:55–1:30 | **Transform + ready** ✅ | `dbt build` green; tables in `james_oakley` |
 | 1:30–1:40 | **Verify** ✅: run twice + full refresh; hand-check 3 pupils (one KS1, two English); one as-at run | Results in README |
-| 1:40–2:00 | **README + push** ✅ (push pending): DQ log, scope and subject decisions, assumptions, next steps, GCSE paragraphs; AI notes into `ai/` | Repo pushed |
+| 1:40–2:00 | **README + push** ✅: DQ log, scope and subject decisions, assumptions, next steps, GCSE paragraphs; AI notes into `ai/` | Repo pushed |
 
 If you're running behind, cut in this order: make the transform models plain tables instead of
 incremental, then the as-at run, then the GCSE section. Never cut the DQ log, the scope and
