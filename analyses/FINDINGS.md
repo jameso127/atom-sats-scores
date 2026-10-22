@@ -183,7 +183,7 @@ topics, not 5 as CLAUDE.md said (corrected).
 Every sitting contains exactly one subject (14), so **Screeners are not mixed-subject**.
 
 - **Science has questions but no responses.** **Decision:** removed from
-  `seed_subject_to_ks2_test` for now, with a README note; re-adding it is a seed edit.
+  the subject mapping seed for now, with a README note; re-adding it is a seed edit.
 - **Screeners.** The planned evidence for excluding them (null `is_correct`, mixed subjects)
   doesn't hold: they have right/wrong answers and single-subject sittings. **Decision:** no scaled
   score, because they're diagnostic checks, not a curriculum subject with a KS2 test; the app table
@@ -194,7 +194,9 @@ Every sitting contains exactly one subject (14), so **Screeners are not mixed-su
 English: KS1 6,588 / KS2 21,012. Maths: KS1 5,247 / KS2 13,708 (52 KS1 pupils in each).
 Everything else is KS2 only, apart from Wellbeing.
 
-**Decision:** KS1 pupils are scored in English and Maths, labelled KS1 ("on track for KS2").
+**Decision:** KS1 pupils are scored in English and Maths. Originally on the KS2 scale; later
+changed to the official KS1 tables (85–115), with only responses whose key stage matches the
+assessment's majority key stage counted (see 32).
 
 ## Scope, coverage, dates
 
@@ -236,6 +238,23 @@ responses than `total_questions` (05), and incomplete sittings still count.
 **Decision:** default `as_at` = max `answered_at` (2026-09-16). Open decision "conversion years
 needed" is resolved: the data needs the 2025 and 2026 tables; 2024 is loaded but unused; no
 pre-2024 tables needed.
+
+### 32 Key-stage match (KS1 tables added 2026-10-22)
+Each assessment's key stage is the one most of its sittings are in (tie = KS2). Profiling (15)
+found 13 assessments sat by both KS1 and KS2 pupils (276 sittings).
+
+**Decision (user):** score each key stage on its own STA tables (KS1 85–115, KS2 80–120) and only
+count responses where the pupil's key stage at the sitting matches the assessment's, in both
+directions. **Result (32):** no assessment is tied.
+
+| assessment | pupil | subject | responses | pupils | scored |
+|---|---|---|---|---|---|
+| KS1 | KS1 | English / Maths | 6,323 / 5,014 | 51 | yes |
+| KS1 | KS2 | English / Maths | 18 / 50 | 1 / 2 | **no** |
+| KS2 | KS1 | English / Maths | 265 / 233 | 4 / 4 | **no** |
+| KS2 | KS2 | English / Maths / Screeners / VR / NVR | 20,994 / 13,658 / 10,948 / 691 / 144 | | yes |
+
+**Affected:** 566 responses dropped (498 KS1-on-KS2, 68 KS2-on-KS1), 1.2% of English / Maths.
 
 ---
 

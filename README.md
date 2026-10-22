@@ -1,7 +1,7 @@
 # Atom: KS2 SATs scaled scores
 
-A dbt project on BigQuery that gives every pupil a KS2 SATs-style scaled score (80–120) in Maths
-and English, plus % correct in every assessed subject, recomputable as at any date. The output is
+A dbt project on BigQuery that gives every pupil a SATs-style scaled score in Maths and English
+(KS1 85–115, KS2 80–120, on the official STA tables for their key stage), plus % correct in every assessed subject, recomputable as at any date. The output is
 a flat, long table (one row per pupil × subject), ready for the app database.
 
 Supporting material: `analyses/FINDINGS.md` (profiling and data quality evidence), `PLAN.md`
@@ -36,19 +36,19 @@ atom_ks2:
       job_execution_timeout_seconds: 300
 ```
 
-**Updating the conversion tables** (STA publishes each July):
-`uv run python scripts/build_ks2_conversion_seed.py <year>` fetches the year's tables from the
-GOV.UK Content API, checks them, writes `seeds/ks2_scaled_scores/seed_ks2_scaled_scores_<year>.csv`
-and regenerates `models/staging/stg_ks2_scaled_score_conversion.sql` (a union of every year).
+**Updating the conversion tables** (STA publishes KS1 in June, KS2 in July):
+`uv run python scripts/build_conversion_seed.py <ks1|ks2> <year>` fetches the tables from the
+GOV.UK Content API, checks them, writes `seeds/scaled_scores/seed_scaled_scores_<ks>_<year>.csv`
+and regenerates `models/staging/stg_scaled_score_conversion.sql` (a union of every table).
 Then `uv run dbt build`.
 
 ## Outputs
 All in `atom-analytics-candidates.james_oakley`.
 
 ```
-de_raw.* ──► stg_* views ──► trf_pupil_subject_daily (incremental)
-                                                         │
-STA seeds ► stg_ks2_scaled_score_conversion              ▼
+de_raw.* ──► stg_* views ──┬──────────────────────────► trf_pupil_subject_daily (incremental)
+                           └► trf_assessment_key_stage ──┘          │
+STA KS1 + KS2 seeds ► stg_scaled_score_conversion                    ▼
    └► trf_percent_to_scaled_score (lookup) ──────► pupil_subject_year_scores ► pupil_subject_sats_scores
 ```
 
@@ -56,12 +56,14 @@ STA seeds ► stg_ks2_scaled_score_conversion              ▼
 |---|---|---|---|
 | `pupil_subject_sats_scores` | ready | **pupil × subject** (the app table): the latest year group's score; key `(pupil_id, subject_name)` | table |
 | `pupil_subject_year_scores` | ready | pupil × subject × year group; key `(pupil_id, subject_name, year_group)` | table |
-| `trf_percent_to_scaled_score` | transform | conversion year × subject × whole percent (0–100) | table |
-| `trf_pupil_subject_daily` | transform | pupil × subject × year group × day (in-scope responses only) | incremental, `insert_overwrite` of the last 3 days |
+| `trf_percent_to_scaled_score` | transform | key stage × conversion year × subject × whole percent (0–100) | table |
+| `trf_assessment_key_stage` | transform | assessment: the key stage it's mainly sat by | table |
+| `trf_pupil_subject_daily` | transform | pupil × subject × key stage × year group × day (in-scope responses only) | incremental, `insert_overwrite` of the last 3 days |
 | `stg_*` | staging | the source tables (only the columns used); the conversion seeds unioned | views |
 
-Columns of `pupil_subject_sats_scores`: `pupil_id`, `subject_name`, `year_group` (the year group
-the score is for), `scaled_score` (80–120, Maths and English only, null otherwise),
+Columns of `pupil_subject_sats_scores`: `pupil_id`, `subject_name`, `key_stage` and `year_group`
+(what the score is for), `scaled_score` (Maths and English only: KS1 85–115, KS2 80–120; null
+otherwise),
 `percent_correct`, `n_answered`, `n_correct`, `conversion_table_year`, `last_answered_date`.
 A pupil has a row only for subjects they've answered something in; **no row = no score yet**.
 A scaled score of 100 or more meets the expected standard. `pupil_subject_year_scores` has the
@@ -69,29 +71,34 @@ same columns for every year group, not just the latest.
 
 ## How a score is calculated
 1. **Scope.** A response counts when its sitting exists and isn't deleted, its pupil isn't deleted,
-   and the sitting style is `fixed_question` or `non_adaptive` (adaptive tunes difficulty to the
-   pupil, so % correct stops measuring ability; surveys have no right answers).
+   the sitting style is `fixed_question` or `non_adaptive` (adaptive tunes difficulty to the
+   pupil, so % correct stops measuring ability; surveys have no right answers), and **the pupil's
+   key stage at the sitting matches the assessment's**. Each assessment's key stage is the one
+   most of its sittings are in (tie = KS2; `trf_assessment_key_stage`), so a KS1 pupil's go at a
+   KS2 assessment isn't scored, nor a KS2 pupil's go at a KS1 one.
 2. **Add up per year group.** For each pupil × subject × year group (of the sitting), add up every
    response up to the as-at date: `percent_correct = 100 × n_correct / n_answered`. A skipped
    question counts as answered and wrong, as on a real paper.
 3. **Look up the scaled score** (Maths and English only) in `trf_percent_to_scaled_score`, on
+   - the pupil's **key stage** at the sitting (KS1 = Years 1–2, KS2 = 3–6): KS1 uses the KS1
+     tables (85–115), KS2 the KS2 tables (80–120);
    - the **academic year** (Sep–Aug) of the pupil's latest response in that year group: Sep 2025 –
-     Aug 2026 uses the 2025 table, which STA published in July 2025. Calendar year would need the
-     2026 table from January 2026, months before it exists, and would silently change old scores
-     when it arrived;
+     Aug 2026 uses the 2025 tables, which STA published in June / July 2025. Calendar year would
+     need the 2026 tables from January 2026, months before they exist, and would silently change
+     old scores when they arrived;
    - the subject;
    - `percent_correct` rounded down to a whole percent.
-4. **The lookup** is built once from the official STA tables (2024, 2025, 2026): for each percent,
-   the equivalent raw mark on each KS2 test is `floor(percent × full marks / 100)` (marks are
+4. **The lookup** is built once from the official STA tables (KS1 and KS2, 2024–2026): for each
+   percent, the equivalent raw mark on each test is `floor(percent × full marks / 100)` (marks are
    earned, so round down), converted with the official table. English averages its reading and
-   GPS scores (`seeds/seed_subject_to_ks2_test.csv`). Raw marks 0–2 have no official score and
-   count as 80.
+   GPS scores at both key stages (`seeds/seed_subject_to_test.csv`). Raw marks 0–2 have no
+   official score and count as the bottom of the scale (KS1 85, KS2 80).
 5. **The app table** keeps, for each pupil × subject, the latest year group's row.
 
 Atom's assessments are shorter than real papers, which is why scoring goes through a percentage
-rather than looking up a raw total. The percentage isn't mapped straight onto 80–120 because the
-official curve isn't linear: 90% in Maths (99/110) scores 112 on the 2025 table, a straight
-line gives 116.
+rather than looking up a raw total. The percentage isn't mapped straight onto the scale because
+the official curve isn't linear: 90% in KS2 Maths (99/110) scores 112 on the 2025 table, a
+straight line gives 116.
 
 ## Scope and subject decisions
 | subject | treatment | why |
@@ -104,9 +111,15 @@ line gives 116.
 | Wellbeing | not included | surveys only, no right answers |
 
 ## Assumptions and design trade-offs
-- **One KS2 scale for everyone.** KS1 pupils are scored on the KS2 80–120 curve, so a KS1 or
-  Year 3–4 score is "on track for KS2 on age-appropriate work", not current SATs attainment;
-  `year_group` lets the app label it. Real KS1 tests have their own 85–115 scale (next step).
+- **Each key stage on its own scale.** KS1 pupils (Years 1–2) are scored on the official KS1
+  tables (85–115), KS2 pupils on the KS2 tables (80–120), so `key_stage` must be shown alongside
+  the score: a KS1 100 and a KS2 100 both mean "expected standard" but aren't the same score.
+  KS1 tests have been optional since 2024, but STA still publishes their tables. A Year 3–4 score
+  is still on the KS2 curve, so it's an "on track for KS2" measure, not SATs attainment.
+- **Assessment key stage by majority.** An assessment's key stage is where most of its sittings
+  are (tie = KS2, the harder content). Responses from pupils in the other key stage are dropped,
+  so a KS1 pupil stretching to KS2 work, or a KS2 pupil revising KS1 work, doesn't distort their
+  score. See `analyses/32_key_stage_mismatch.sql` for how many responses this removes.
 - **Each year group is scored separately**, so a Year 5 score isn't diluted by Year 2 work. The
   flip side: early in a new school year the current score rests on few responses (in Sep 2026, 26
   pupils had only that month's work). `n_answered` is in the output so the app can judge it.
@@ -149,33 +162,42 @@ Full log with numbers: `analyses/FINDINGS.md`. The issues that affect scores:
   from scaled scores because there's no KS2 test, not because of data quality).
 
 ## Verification
-Run on 2026-10-21.
+Run on 2026-10-22, after adding the KS1 tables and the key-stage match.
 
-- **`dbt build --full-refresh`:** 59 tests pass; 1 expected warning (the 1,433 responses whose
+- **`dbt build --full-refresh`:** 45 tests pass; 1 expected warning (the 1,433 responses whose
   sitting is missing).
 - **Re-runnable:** row counts and an order-independent checksum of each model
   (`analyses/29_output_checksums.sql`) are identical after the full refresh and an incremental
-  run: 63,707 responses → 1,415 daily rows → 407 year scores → 399 app rows (pupil × subject).
+  run: 63,707 responses → 1,399 daily rows → 405 year scores → 399 app rows (pupil × subject).
+- **Key-stage match** (`analyses/32_key_stage_mismatch.sql`): 566 responses are dropped, 498 from
+  KS1 pupils on mainly-KS2 assessments (8 pupils) and 68 from KS2 pupils on mainly-KS1 assessments
+  (3 pupils). No assessment was tied.
 - **Hand check** (`analyses/30_hand_check.sql`): the current score is recomputed straight from
-  `de_raw` for the most active KS1 and KS2 pupil in each subject; all four match the model.
+  `de_raw` (including the key-stage match) for the most active KS1 and KS2 pupil in each subject;
+  all four match the model.
 
-  | subject | year | answered | correct | % | working (2025 table) | score |
-  |---|---|---|---|---|---|---|
-  | English | 2 | 181 | 157 | 86.7% | gps raw 60 → 115; reading raw 43 → 113 | 114 |
-  | English | 5 | 322 | 144 | 44.7% | gps raw 30 → 98; reading raw 22 → 96 | 97 |
-  | Maths | 2 | 144 | 93 | 64.6% | maths raw 70 → 102 | 102 |
-  | Maths | 5 | 189 | 97 | 51.3% | maths raw 56 → 99 | 99 |
-- **As-at run** (`as_at: 2026-03-01`): 134 pupils have English and Maths scores (no Screeners or
-  reasoning sittings by then); rebuilding without `as_at` restores the original checksum.
+  | subject | key stage | year | answered | correct | % | working (2025 tables) | score |
+  |---|---|---|---|---|---|---|---|
+  | English | KS1 | 2 | 181 | 157 | 86.7% | gps raw 34 → 109; reading raw 34 → 107 | 108 |
+  | English | KS2 | 5 | 322 | 144 | 44.7% | gps raw 30 → 98; reading raw 22 → 96 | 97 |
+  | Maths | KS1 | 2 | 144 | 93 | 64.6% | maths raw 38 → 101 | 101 |
+  | Maths | KS2 | 5 | 189 | 97 | 51.3% | maths raw 56 → 99 | 99 |
+- **As-at run:** checked on 2026-10-21 (`as_at: 2026-03-01` adds up only earlier responses, and a
+  rebuild without `as_at` restores the current tables); the mechanism hasn't changed since.
 - **Distribution** (`analyses/31_score_distribution.sql`, app table):
 
-  | subject | pupils | scaled score quartiles | meet expected (≥ 100) | avg % correct |
-  |---|---|---|---|---|
-  | English | 154 | 85 / 98 / 102 / 105 / 120 | 65% | 57.8 |
-  | Maths | 152 | 80 / 97 / 101 / 104 / 114 | 57% | 57.6 |
-  | Screeners | 82 | — | — | 52.4 |
-  | Verbal Reasoning | 8 | — | — | 46.3 |
-  | Non-Verbal Reasoning | 3 | — | — | 63.9 |
+  | subject | key stage | pupils | scaled score quartiles | meet expected (≥ 100) | avg % correct |
+  |---|---|---|---|---|---|
+  | English | KS1 | 48 | 85 / 96 / 99 / 102 / 115 | 50% | 57.9 |
+  | English | KS2 | 106 | 87 / 98 / 101 / 105 / 120 | 65% | 57.8 |
+  | Maths | KS1 | 48 | 92 / 96 / 98 / 100 / 110 | 40% | 55.6 |
+  | Maths | KS2 | 104 | 80 / 97 / 101 / 105 / 114 | 60% | 58.5 |
+  | Screeners | KS2 | 82 | — | — | 52.4 |
+  | Verbal Reasoning | KS2 | 8 | — | — | 46.3 |
+  | Non-Verbal Reasoning | KS2 | 3 | — | — | 63.9 |
+
+  KS1 pupils meet the expected standard less often on the KS1 tables than they did on the KS2
+  curve, because KS1 pupils' similar % correct sits lower on the KS1 curve.
 
 ## Limitations and next steps
 - Score the 1,196 English / Maths responses whose sitting is missing, with an assumed style.
@@ -190,7 +212,7 @@ Run on 2026-10-21.
   Staging is a view rather than an incremental copy because, with the raw table unpartitioned,
   a copy would scan the same data and add a second table to keep in step.
 - `course_hierarchy` has no validity dates: snapshot it from now on.
-- KS1's own 85–115 scale; topic names to split English into reading and GPS; 0.1% lookup steps;
+- Topic names to split English into reading and GPS; 0.1% lookup steps;
   recency weighting within a year group; IRT difficulty calibration (would let adaptive sittings be
   scored, and Atom's questions aren't SATs questions).
 

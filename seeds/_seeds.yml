@@ -1,24 +1,25 @@
 seeds:
-  - name: seed_subject_to_ks2_test
+  - name: seed_subject_to_test
     description: >
-      Maps Atom subject_name to the KS2 test(s) whose conversion curve scores it, with weights.
+      Maps Atom subject_name to the STA test(s) whose conversion curve scores it, with weights.
+      The same mapping applies at KS1 and KS2 (both have reading, GPS and maths tests).
       Subjects not listed get % correct only, no scaled score. Rationale in PLAN.md / README.
-      Grain: one row per subject_name × ks2_test.
+      Grain: one row per subject_name × test_name.
     config:
       column_types:
         subject_name: string
-        ks2_test: string
+        test_name: string
         weight: numeric
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
-            combination_of_columns: [subject_name, ks2_test]
+            combination_of_columns: [subject_name, test_name]
     columns:
       - name: subject_name
         description: Subject name exactly as in course_hierarchy.subject_name.
         data_tests: [not_null]
-      - name: ks2_test
-        description: KS2 test whose curve is used.
+      - name: test_name
+        description: STA test whose curve is used (gps, reading or maths).
         data_tests:
           - not_null
           - accepted_values:

@@ -7,5 +7,5 @@ SELECT
     last_answered_date
 FROM {{ ref('pupil_subject_year_scores') }}
 WHERE
-    subject_name IN (SELECT m.subject_name FROM {{ ref('seed_subject_to_ks2_test') }} AS m)
+    subject_name IN (SELECT m.subject_name FROM {{ ref('seed_subject_to_test') }} AS m)
     AND scaled_score IS NULL

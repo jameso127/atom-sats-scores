@@ -21,6 +21,8 @@ models:
         data_tests: [unique, not_null]
       - name: style
         description: Only fixed_question and non_adaptive are scored.
+      - name: key_stage
+        description: The pupil's key stage at the sitting (KS1 = Years 1-2, KS2 = 3-6, null otherwise).
 
   - name: stg_pupils
     description: "Non-deleted pupils. Grain: one row per pupil."
