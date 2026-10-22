@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 170" width="1200" height="170" role="img">
+<style>
+  .t { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #15245e; }
+  .h { font-family: 'National B Condensed', 'Arial Narrow', 'Roboto Condensed', 'Segoe UI', sans-serif; font-weight: 800; fill: #15245e; }
+  .cap { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+</style>
+<rect width="1200" height="170" rx="24" fill="#f3f8ff"/>
+  <g opacity="0">
+    <rect x="24" y="24" width="268" height="122" rx="20" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+    <rect x="24" y="24" width="8" height="122" rx="4" fill="#2986ff"/>
+    <text x="158" y="92" class="h" font-size="46" font-weight="400" text-anchor="middle" style="fill:#2986ff" >63,707</text>
+    <text x="158" y="124" class="t" font-size="17" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >responses profiled</text>
+    <animate attributeName="opacity" from="0" to="1" begin="0.0s" dur="0.6s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" from="0 14" to="0 0" begin="0.0s" dur="0.6s" fill="freeze"/>
+  </g>
+  <g opacity="0">
+    <rect x="316" y="24" width="268" height="122" rx="20" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+    <rect x="316" y="24" width="8" height="122" rx="4" fill="#15245e"/>
+    <text x="450" y="92" class="h" font-size="46" font-weight="400" text-anchor="middle" style="fill:#15245e" >242</text>
+    <text x="450" y="124" class="t" font-size="17" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >pupils</text>
+    <animate attributeName="opacity" from="0" to="1" begin="0.25s" dur="0.6s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" from="0 14" to="0 0" begin="0.25s" dur="0.6s" fill="freeze"/>
+  </g>
+  <g opacity="0">
+    <rect x="608" y="24" width="268" height="122" rx="20" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+    <rect x="608" y="24" width="8" height="122" rx="4" fill="#4fbf5e"/>
+    <text x="742" y="92" class="h" font-size="46" font-weight="400" text-anchor="middle" style="fill:#4fbf5e" >399</text>
+    <text x="742" y="124" class="t" font-size="17" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >pupil × subject scores</text>
+    <animate attributeName="opacity" from="0" to="1" begin="0.5s" dur="0.6s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" from="0 14" to="0 0" begin="0.5s" dur="0.6s" fill="freeze"/>
+  </g>
+  <g opacity="0">
+    <rect x="900" y="24" width="268" height="122" rx="20" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+    <rect x="900" y="24" width="8" height="122" rx="4" fill="#0f67f5"/>
+    <text x="1034" y="92" class="h" font-size="46" font-weight="400" text-anchor="middle" style="fill:#0f67f5" >45 ✓</text>
+    <text x="1034" y="124" class="t" font-size="17" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >dbt tests passing</text>
+    <animate attributeName="opacity" from="0" to="1" begin="0.75s" dur="0.6s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" from="0 14" to="0 0" begin="0.75s" dur="0.6s" fill="freeze"/>
+  </g>
+</svg>

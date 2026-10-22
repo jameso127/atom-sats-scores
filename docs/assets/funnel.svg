@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 430" width="1200" height="430" role="img">
+<style>
+  .t { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #15245e; }
+  .h { font-family: 'National B Condensed', 'Arial Narrow', 'Roboto Condensed', 'Segoe UI', sans-serif; font-weight: 800; fill: #15245e; }
+  .cap { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+</style>
+<rect width="1200" height="430" rx="24" fill="#f3f8ff"/><text x="40" y="50" class="cap" font-size="15" font-weight="400" text-anchor="start" style="fill:#2986ff" >WHICH RESPONSES ARE SCORED</text>
+  <text x="40" y="106" class="t" font-size="16" font-weight="700" text-anchor="start" >All responses</text>
+  <rect x="400" y="86" width="0" height="30" rx="8" fill="#15245e">
+    <animate attributeName="width" from="0" to="760" begin="0.0s" dur="0.9s" fill="freeze"/>
+  </rect>
+  <text x="1148.0" y="107" class="t" font-size="16" font-weight="700" text-anchor="end" style="fill:#ffffff" >63,707</text>
+  <text x="1160" y="107" class="t" font-size="14" font-weight="400" text-anchor="end" style="fill:#5d6c7b" ></text>
+  <text x="40" y="162" class="t" font-size="16" font-weight="700" text-anchor="start" >Sitting missing from assessment_sittings</text>
+  <rect x="400" y="142" width="0" height="30" rx="8" fill="#f75050">
+    <animate attributeName="width" from="0" to="17" begin="0.3s" dur="0.9s" fill="freeze"/>
+  </rect>
+  <text x="429.0951386817775" y="163" class="t" font-size="16" font-weight="700" text-anchor="start" style="fill:#f75050" >-1,433</text>
+  <text x="1160" y="163" class="t" font-size="14" font-weight="400" text-anchor="end" style="fill:#5d6c7b" >excluded</text>
+  <text x="40" y="218" class="t" font-size="16" font-weight="700" text-anchor="start" >Survey sittings (Wellbeing)</text>
+  <rect x="400" y="198" width="0" height="30" rx="8" fill="#f75050">
+    <animate attributeName="width" from="0" to="47" begin="0.6s" dur="0.9s" fill="freeze"/>
+  </rect>
+  <text x="458.9549657023561" y="219" class="t" font-size="16" font-weight="700" text-anchor="start" style="fill:#f75050" >-3,936</text>
+  <text x="1160" y="219" class="t" font-size="14" font-weight="400" text-anchor="end" style="fill:#5d6c7b" >no right answers</text>
+  <text x="40" y="274" class="t" font-size="16" font-weight="700" text-anchor="start" >Pupil's key stage ≠ assessment's</text>
+  <rect x="400" y="254" width="0" height="30" rx="8" fill="#f75050">
+    <animate attributeName="width" from="0" to="10" begin="0.8999999999999999s" dur="0.9s" fill="freeze"/>
+  </rect>
+  <text x="422" y="275" class="t" font-size="16" font-weight="700" text-anchor="start" style="fill:#f75050" >-566</text>
+  <text x="1160" y="275" class="t" font-size="14" font-weight="400" text-anchor="end" style="fill:#5d6c7b" >KS1 on KS2 or reverse</text>
+  <text x="40" y="330" class="t" font-size="16" font-weight="700" text-anchor="start" >Scored: % correct, every subject</text>
+  <rect x="400" y="310" width="0" height="30" rx="8" fill="#2986ff">
+    <animate attributeName="width" from="0" to="689" begin="1.2s" dur="0.9s" fill="freeze"/>
+  </rect>
+  <text x="1077.1977333730988" y="331" class="t" font-size="16" font-weight="700" text-anchor="end" style="fill:#ffffff" >57,772</text>
+  <text x="1160" y="331" class="t" font-size="14" font-weight="400" text-anchor="end" style="fill:#5d6c7b" ></text>
+  <text x="40" y="386" class="t" font-size="16" font-weight="700" text-anchor="start" >…of which English &amp; Maths get scaled scores</text>
+  <rect x="400" y="366" width="0" height="30" rx="8" fill="#4fbf5e">
+    <animate attributeName="width" from="0" to="549" begin="1.5s" dur="0.9s" fill="freeze"/>
+  </rect>
+  <text x="960.6310766477781" y="387" class="t" font-size="16" font-weight="700" text-anchor="start" style="fill:#4fbf5e" >45,989</text>
+  <text x="1160" y="387" class="t" font-size="14" font-weight="400" text-anchor="end" style="fill:#5d6c7b" ></text>
+</svg>

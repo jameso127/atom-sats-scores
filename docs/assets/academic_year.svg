@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300" role="img">
+<style>
+  .t { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #15245e; }
+  .h { font-family: 'National B Condensed', 'Arial Narrow', 'Roboto Condensed', 'Segoe UI', sans-serif; font-weight: 800; fill: #15245e; }
+  .cap { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+</style>
+
+  <rect width="1200" height="300" rx="24" fill="#ffffff" stroke="#e5f1ff" stroke-width="2"/>
+  <text x="40" y="50" class="cap" font-size="15" font-weight="400" text-anchor="start" style="fill:#2986ff" >WHICH TABLES A SCORE USES: THE ACADEMIC YEAR (SEP–AUG) OF THE PUPIL'S LATEST ANSWER</text>
+  <rect x="420.0" y="120" width="540.0" height="66" rx="14" fill="#2986ff"/>
+  <text x="440.0" y="150" class="t" font-size="18" font-weight="700" text-anchor="start" style="fill:#ffffff" >Academic year 2025/26</text>
+  <text x="440.0" y="174" class="t" font-size="16" font-weight="400" text-anchor="start" style="fill:#e5f1ff" >→ uses the 2025 tables</text>
+  <rect x="960.0" y="120" width="180.0" height="66" rx="14" fill="#c2dfff"/>
+  <text x="974.0" y="150" class="t" font-size="18" font-weight="700" text-anchor="start" >2026/27</text>
+  <text x="974.0" y="174" class="t" font-size="16" font-weight="400" text-anchor="start" style="fill:#15245e" >→ 2026 tables</text>
+  <line x1="60" y1="196" x2="1140" y2="196" stroke="#99c9ff" stroke-width="3"/>
+  <line x1="60.0" y1="196" x2="60.0" y2="214" stroke="#99c9ff" stroke-width="2"/><text x="60.0" y="236" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >Jan 2025</text><line x1="105.0" y1="196" x2="105.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="150.0" y1="196" x2="150.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="195.0" y1="196" x2="195.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="240.0" y1="196" x2="240.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="285.0" y1="196" x2="285.0" y2="206" stroke="#99c9ff" stroke-width="2"/><text x="285.0" y="236" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >Jun 2025</text><line x1="330.0" y1="196" x2="330.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="375.0" y1="196" x2="375.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="420.0" y1="196" x2="420.0" y2="206" stroke="#99c9ff" stroke-width="2"/><text x="420.0" y="236" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >Sep 2025</text><line x1="465.0" y1="196" x2="465.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="510.0" y1="196" x2="510.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="555.0" y1="196" x2="555.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="600.0" y1="196" x2="600.0" y2="214" stroke="#99c9ff" stroke-width="2"/><text x="600.0" y="236" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >Jan 2026</text><line x1="645.0" y1="196" x2="645.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="690.0" y1="196" x2="690.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="735.0" y1="196" x2="735.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="780.0" y1="196" x2="780.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="825.0" y1="196" x2="825.0" y2="206" stroke="#99c9ff" stroke-width="2"/><text x="825.0" y="236" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >Jun 2026</text><line x1="870.0" y1="196" x2="870.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="915.0" y1="196" x2="915.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="960.0" y1="196" x2="960.0" y2="206" stroke="#99c9ff" stroke-width="2"/><text x="960.0" y="236" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >Sep 2026</text><line x1="1005.0" y1="196" x2="1005.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="1050.0" y1="196" x2="1050.0" y2="206" stroke="#99c9ff" stroke-width="2"/><line x1="1095.0" y1="196" x2="1095.0" y2="206" stroke="#99c9ff" stroke-width="2"/>
+  <g>
+    <circle cx="285.0" cy="100" r="9" fill="#4fbf5e"/><circle cx="330.0" cy="100" r="9" fill="#ffb61a"/>
+    <text x="348.0" y="106" class="t" font-size="14" font-weight="700" text-anchor="start" >STA publishes KS1 (Jun) &amp; KS2 (Jul) tables</text>
+  </g>
+  <rect x="510.0" y="252" width="495.0" height="10" rx="5" fill="#4fbf5e" opacity="0.8"/>
+  <text x="510.0" y="284" class="t" font-size="14" font-weight="700" text-anchor="start" style="fill:#4fbf5e" >our data: Nov 2025 – Sep 2026</text>
+
+  <text x="1140" y="284" class="t" font-size="14" font-weight="400" text-anchor="end" style="fill:#f75050" >calendar year: 2026 tables needed before they exist</text>
+</svg>

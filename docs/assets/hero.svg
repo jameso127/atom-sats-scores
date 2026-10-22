@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img">
+<style>
+  .t { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #15245e; }
+  .h { font-family: 'National B Condensed', 'Arial Narrow', 'Roboto Condensed', 'Segoe UI', sans-serif; font-weight: 800; fill: #15245e; }
+  .cap { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+</style>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#15245e"/><stop offset="1" stop-color="#0f67f5"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="320" rx="28" fill="url(#bg)"/>
+  <circle cx="1130" cy="40" r="120" fill="#2986ff" opacity="0.25"/>
+  <circle cx="80" cy="330" r="140" fill="#2986ff" opacity="0.18"/>
+  <text x="64" y="92" class="cap" font-size="16" font-weight="400" text-anchor="start" style="fill:#99c9ff" >TAKE-HOME TASK · DATA ENGINEERING</text>
+  <text x="64" y="158" class="h" font-size="62" font-weight="400" text-anchor="start" style="fill:#ffffff" >SATs-style scaled scores</text>
+  <text x="64" y="206" class="t" font-size="24" font-weight="400" text-anchor="start" style="fill:#e5f1ff" >From raw pupil activity to KS1 &amp; KS2 scaled scores,</text>
+  <text x="64" y="238" class="t" font-size="24" font-weight="400" text-anchor="start" style="fill:#e5f1ff" >re-runnable and point-in-time, with dbt on BigQuery.</text>
+  <rect x="64" y="262" width="96" height="6" rx="3" fill="#ffb61a"/>
+  
+  <g opacity="0">
+    <rect x="700" y="236" width="78" height="40" rx="20" fill="#ffffff" opacity="0.95"/>
+    <text x="739" y="263" class="h" font-size="22" text-anchor="middle" fill="#2986ff">108</text>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.75;1" dur="5.2s" begin="0s" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="translate" values="0 18;0 0;0 -22" dur="5.2s" begin="0s" repeatCount="indefinite"/>
+  </g>
+  <g opacity="0">
+    <rect x="760" y="70" width="78" height="40" rx="20" fill="#ffffff" opacity="0.95"/>
+    <text x="799" y="97" class="h" font-size="22" text-anchor="middle" fill="#2986ff">97</text>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.75;1" dur="5.2s" begin="1.3s" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="translate" values="0 18;0 0;0 -22" dur="5.2s" begin="1.3s" repeatCount="indefinite"/>
+  </g>
+  <g opacity="0">
+    <rect x="1080" y="250" width="78" height="40" rx="20" fill="#ffffff" opacity="0.95"/>
+    <text x="1119" y="277" class="h" font-size="22" text-anchor="middle" fill="#2986ff">114</text>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.75;1" dur="5.2s" begin="2.6s" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="translate" values="0 18;0 0;0 -22" dur="5.2s" begin="2.6s" repeatCount="indefinite"/>
+  </g>
+  <g opacity="0">
+    <rect x="720" y="150" width="78" height="40" rx="20" fill="#ffffff" opacity="0.95"/>
+    <text x="759" y="177" class="h" font-size="22" text-anchor="middle" fill="#2986ff">101</text>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.75;1" dur="5.2s" begin="3.9s" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="translate" values="0 18;0 0;0 -22" dur="5.2s" begin="3.9s" repeatCount="indefinite"/>
+  </g>
+  
+  <g transform="rotate(0 980 160)">
+    <path d="M 870 160 a 110 42 0 1 0 220 0 a 110 42 0 1 0 -220 0" fill="none" stroke="#99c9ff" stroke-width="2" opacity="0.55"/>
+    <circle r="8" fill="#ffb61a">
+      <animateMotion dur="4s" repeatCount="indefinite" path="M 870 160 a 110 42 0 1 0 220 0 a 110 42 0 1 0 -220 0"/>
+    </circle>
+  </g>
+  <g transform="rotate(60 980 160)">
+    <path d="M 870 160 a 110 42 0 1 0 220 0 a 110 42 0 1 0 -220 0" fill="none" stroke="#99c9ff" stroke-width="2" opacity="0.55"/>
+    <circle r="8" fill="#4fbf5e">
+      <animateMotion dur="5s" repeatCount="indefinite" path="M 870 160 a 110 42 0 1 0 220 0 a 110 42 0 1 0 -220 0"/>
+    </circle>
+  </g>
+  <g transform="rotate(120 980 160)">
+    <path d="M 870 160 a 110 42 0 1 0 220 0 a 110 42 0 1 0 -220 0" fill="none" stroke="#99c9ff" stroke-width="2" opacity="0.55"/>
+    <circle r="8" fill="#ffffff">
+      <animateMotion dur="6s" repeatCount="indefinite" path="M 870 160 a 110 42 0 1 0 220 0 a 110 42 0 1 0 -220 0"/>
+    </circle>
+  </g>
+  <circle cx="980" cy="160" r="22" fill="#ffb61a"/>
+  <circle cx="980" cy="160" r="22" fill="none" stroke="#ffb61a" stroke-width="3">
+    <animate attributeName="r" values="22;40" dur="2.4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0" dur="2.4s" repeatCount="indefinite"/>
+  </circle>
+</svg>
