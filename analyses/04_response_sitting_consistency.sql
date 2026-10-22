@@ -5,14 +5,14 @@
 -- whether answered_at can be trusted as event time.
 -- Assumes session_id is unique in assessment_sittings (see 01).
 SELECT
-    COUNT(*)                                                           AS n_responses_with_sitting,
-    COUNTIF(r.pupil_id IS DISTINCT FROM s.pupil_id)                    AS n_pupil_mismatch,
-    COUNTIF(r.session_type IS DISTINCT FROM s.session_type)            AS n_session_type_mismatch,
-    COUNTIF(r.answered_at IS NULL)                                     AS n_answered_at_null,
-    COUNTIF(r.answered_at < s.started_at)                              AS n_answered_before_start,
-    COUNTIF(r.answered_at > s.finished_at)                             AS n_answered_after_finish,
-    COUNTIF(TIMESTAMP_DIFF(s.started_at, r.answered_at, MINUTE) > 60)  AS n_answered_over_1h_before_start,
-    COUNTIF(TIMESTAMP_DIFF(r.answered_at, s.finished_at, MINUTE) > 60) AS n_answered_over_1h_after_finish
-FROM `atom-analytics-candidates.de_raw.responses` AS r
-INNER JOIN `atom-analytics-candidates.de_raw.assessment_sittings` AS s
-    ON r.session_id = s.session_id
+    COUNT(*)                                                                    AS n_responses_with_sitting,
+    COUNTIF(resp.pupil_id IS DISTINCT FROM sitting.pupil_id)                    AS n_pupil_mismatch,
+    COUNTIF(resp.session_type IS DISTINCT FROM sitting.session_type)            AS n_session_type_mismatch,
+    COUNTIF(resp.answered_at IS NULL)                                           AS n_answered_at_null,
+    COUNTIF(resp.answered_at < sitting.started_at)                              AS n_answered_before_start,
+    COUNTIF(resp.answered_at > sitting.finished_at)                             AS n_answered_after_finish,
+    COUNTIF(TIMESTAMP_DIFF(sitting.started_at, resp.answered_at, MINUTE) > 60)  AS n_answered_over_1h_before_start,
+    COUNTIF(TIMESTAMP_DIFF(resp.answered_at, sitting.finished_at, MINUTE) > 60) AS n_answered_over_1h_after_finish
+FROM `atom-analytics-candidates.de_raw.responses` AS resp
+INNER JOIN `atom-analytics-candidates.de_raw.assessment_sittings` AS sitting
+    ON resp.session_id = sitting.session_id

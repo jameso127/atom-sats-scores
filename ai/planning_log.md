@@ -250,3 +250,13 @@ Decisions made with AI assistance (Claude Code), newest last. Detailed rationale
   full refresh and incremental (1,399 daily → 405 year scores → 399 app rows); hand check 4/4 with
   KS1 pupils on KS1 tables (e.g. Year 2 English 114 on KS2 curve → 108 on KS1); the key-stage
   match drops 566 responses, no tied assessments. Query 31 now splits by key stage.
+
+## 2026-10-22: table aliases at least 4 characters
+- User asked for a SQLFluff rule enforcing longer table aliases. Added AL06
+  (`aliasing.length`, `min_alias_length = 4`) to `.sqlfluff`; it applies to models, tests and
+  analyses. AL06 can't auto-fix, so 91 aliases in 25 files were renamed with consistent names
+  (responses → `resp`, sittings → `sitting`, pupils → `pupil`, questions → `question`, assessment
+  key stage → `assess`, totals → `total`, mapping → `mapping`, conversion → `conv`). Two first
+  attempts failed lint and were corrected: `lookup` is a BigQuery reserved word (now
+  `pct_lookup`), and `tbl` was still 3 characters (now `model_rows`). Lint clean; a scan found no
+  leftover short alias references.

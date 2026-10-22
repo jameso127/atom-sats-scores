@@ -12,10 +12,10 @@ WITH questions AS (
 
 response_subjects AS (
     SELECT
-        r.session_id,
-        COALESCE(q.subject_name, '(no question match)') AS subject_name
-    FROM `atom-analytics-candidates.de_raw.responses` AS r
-    LEFT JOIN questions AS q ON r.question_id = q.question_id
+        resp.session_id,
+        COALESCE(question.subject_name, '(no question match)') AS subject_name
+    FROM `atom-analytics-candidates.de_raw.responses` AS resp
+    LEFT JOIN questions AS question ON resp.question_id = question.question_id
 ),
 
 sitting_subjects AS (
@@ -27,11 +27,11 @@ sitting_subjects AS (
 )
 
 SELECT
-    s.style,
-    ss.subjects,
+    sitting.style,
+    sit_subj.subjects,
     COUNT(*) AS n_sittings
-FROM sitting_subjects AS ss
-LEFT JOIN `atom-analytics-candidates.de_raw.assessment_sittings` AS s
-    ON ss.session_id = s.session_id
-GROUP BY s.style, ss.subjects
-ORDER BY s.style ASC, n_sittings DESC
+FROM sitting_subjects AS sit_subj
+LEFT JOIN `atom-analytics-candidates.de_raw.assessment_sittings` AS sitting
+    ON sit_subj.session_id = sitting.session_id
+GROUP BY sitting.style, sit_subj.subjects
+ORDER BY sitting.style ASC, n_sittings DESC

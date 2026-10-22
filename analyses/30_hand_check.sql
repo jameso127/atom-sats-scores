@@ -27,21 +27,21 @@ assessments AS (
 
 in_scope AS (
     SELECT
-        r.pupil_id,
-        ch.subject_name,
-        r.is_correct,
-        s.year_group_at_sitting,
-        s.key_stage,
-        r.answered_at
-    FROM `atom-analytics-candidates.de_raw.responses` AS r
-    INNER JOIN sittings AS s ON r.session_id = s.session_id
-    INNER JOIN assessments AS a ON s.assessment_id = a.assessment_id
-    INNER JOIN `atom-analytics-candidates.de_raw.course_hierarchy` AS ch
-        ON r.question_id = ch.question_id
+        resp.pupil_id,
+        hier.subject_name,
+        resp.is_correct,
+        sitting.year_group_at_sitting,
+        sitting.key_stage,
+        resp.answered_at
+    FROM `atom-analytics-candidates.de_raw.responses` AS resp
+    INNER JOIN sittings AS sitting ON resp.session_id = sitting.session_id
+    INNER JOIN assessments AS assess ON sitting.assessment_id = assess.assessment_id
+    INNER JOIN `atom-analytics-candidates.de_raw.course_hierarchy` AS hier
+        ON resp.question_id = hier.question_id
     WHERE
-        s.style IN ('fixed_question', 'non_adaptive')
-        AND s.key_stage = a.key_stage
-        AND ch.subject_name IN ('Maths', 'English')
+        sitting.style IN ('fixed_question', 'non_adaptive')
+        AND sitting.key_stage = assess.key_stage
+        AND hier.subject_name IN ('Maths', 'English')
 ),
 
 -- Totals per pupil × subject × year group, keeping each pupil's latest year group.
@@ -109,49 +109,49 @@ tests AS (
 
 by_hand AS (
     SELECT
-        w.pupil_id,
-        w.subject_name,
-        ANY_VALUE(w.key_stage)       AS key_stage,
-        ANY_VALUE(w.last_year_group) AS last_year_group,
-        ANY_VALUE(w.n_answered)      AS n_answered,
-        ANY_VALUE(w.n_correct)       AS n_correct,
-        ANY_VALUE(w.table_year)      AS table_year,
+        pick.pupil_id,
+        pick.subject_name,
+        ANY_VALUE(pick.key_stage)       AS key_stage,
+        ANY_VALUE(pick.last_year_group) AS last_year_group,
+        ANY_VALUE(pick.n_answered)      AS n_answered,
+        ANY_VALUE(pick.n_correct)       AS n_correct,
+        ANY_VALUE(pick.table_year)      AS table_year,
         STRING_AGG(
-            t.test_name || ' raw ' || CAST(DIV(DIV(100 * w.n_correct, w.n_answered) * c.max_raw_score, 100) AS STRING)
-            || ' -> ' || CAST(c.scaled_score AS STRING), '; ' ORDER BY t.test_name
-        )                            AS working,
-        CAST(ROUND(SUM(t.weight * COALESCE(c.scaled_score, c.min_scaled_score)) / SUM(t.weight)) AS INT64)
+            test.test_name || ' raw ' || CAST(DIV(DIV(100 * pick.n_correct, pick.n_answered) * conv.max_raw_score, 100) AS STRING)
+            || ' -> ' || CAST(conv.scaled_score AS STRING), '; ' ORDER BY test.test_name
+        )                               AS working,
+        CAST(ROUND(SUM(test.weight * COALESCE(conv.scaled_score, conv.min_scaled_score)) / SUM(test.weight)) AS INT64)
             AS scaled_by_hand
-    FROM picked AS w
-    INNER JOIN tests AS t ON w.subject_name = t.subject_name
-    INNER JOIN conversion AS c
+    FROM picked AS pick
+    INNER JOIN tests AS test ON pick.subject_name = test.subject_name
+    INNER JOIN conversion AS conv
         ON
-            w.key_stage = c.key_stage
-            AND w.table_year = c.test_year
-            AND t.test_name = c.test_name
+            pick.key_stage = conv.key_stage
+            AND pick.table_year = conv.test_year
+            AND test.test_name = conv.test_name
             -- Whole percent (rounded down), then equivalent raw mark, as in trf_percent_to_scaled_score.
-            AND DIV(DIV(100 * w.n_correct, w.n_answered) * c.max_raw_score, 100) = c.raw_score
-    GROUP BY w.pupil_id, w.subject_name
+            AND DIV(DIV(100 * pick.n_correct, pick.n_answered) * conv.max_raw_score, 100) = conv.raw_score
+    GROUP BY pick.pupil_id, pick.subject_name
 )
 
 SELECT
-    h.subject_name,
-    h.key_stage,
-    h.last_year_group,
-    h.n_answered,
-    h.n_correct,
-    ROUND(h.n_correct / h.n_answered, 4) AS pct_correct,
-    h.table_year,
-    h.working,
-    h.scaled_by_hand,
-    m.scaled_score                       AS scaled_by_model,
-    m.n_answered                         AS n_answered_by_model,
-    m.conversion_table_year              AS table_year_by_model,
-    h.scaled_by_hand = m.scaled_score    AS is_match
-FROM by_hand AS h
-LEFT JOIN `atom-analytics-candidates.james_oakley.pupil_subject_year_scores` AS m
+    hand.subject_name,
+    hand.key_stage,
+    hand.last_year_group,
+    hand.n_answered,
+    hand.n_correct,
+    ROUND(hand.n_correct / hand.n_answered, 4) AS pct_correct,
+    hand.table_year,
+    hand.working,
+    hand.scaled_by_hand,
+    built.scaled_score                         AS scaled_by_model,
+    built.n_answered                           AS n_answered_by_model,
+    built.conversion_table_year                AS table_year_by_model,
+    hand.scaled_by_hand = built.scaled_score   AS is_match
+FROM by_hand AS hand
+LEFT JOIN `atom-analytics-candidates.james_oakley.pupil_subject_year_scores` AS built
     ON
-        h.pupil_id = m.pupil_id
-        AND h.subject_name = m.subject_name
-        AND h.last_year_group = m.year_group
-ORDER BY h.subject_name, h.key_stage
+        hand.pupil_id = built.pupil_id
+        AND hand.subject_name = built.subject_name
+        AND hand.last_year_group = built.year_group
+ORDER BY hand.subject_name, hand.key_stage

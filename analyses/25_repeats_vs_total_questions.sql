@@ -23,19 +23,19 @@ sitting_rows AS (
 )
 
 SELECT
-    sr.n_repeated_questions > 0  AS has_repeats,
+    sit_rows.n_repeated_questions > 0  AS has_repeats,
     CASE
-        WHEN s.total_questions = sr.n_questions AND s.total_questions = sr.n_rows THEN 'total = questions = rows'
-        WHEN s.total_questions = sr.n_questions THEN 'total = distinct questions'
-        WHEN s.total_questions = sr.n_rows THEN 'total = rows'
-        WHEN s.total_questions > sr.n_rows THEN 'total > rows (incomplete)'
+        WHEN sitting.total_questions = sit_rows.n_questions AND sitting.total_questions = sit_rows.n_rows THEN 'total = questions = rows'
+        WHEN sitting.total_questions = sit_rows.n_questions THEN 'total = distinct questions'
+        WHEN sitting.total_questions = sit_rows.n_rows THEN 'total = rows'
+        WHEN sitting.total_questions > sit_rows.n_rows THEN 'total > rows (incomplete)'
         ELSE 'other'
-    END                          AS total_questions_matches,
-    COUNT(*)                     AS n_sittings,
-    SUM(sr.n_rows)               AS n_rows,
-    SUM(sr.n_repeated_questions) AS n_repeated_questions
-FROM sitting_rows AS sr
-INNER JOIN `atom-analytics-candidates.de_raw.assessment_sittings` AS s
-    ON sr.session_id = s.session_id
+    END                                AS total_questions_matches,
+    COUNT(*)                           AS n_sittings,
+    SUM(sit_rows.n_rows)               AS n_rows,
+    SUM(sit_rows.n_repeated_questions) AS n_repeated_questions
+FROM sitting_rows AS sit_rows
+INNER JOIN `atom-analytics-candidates.de_raw.assessment_sittings` AS sitting
+    ON sit_rows.session_id = sitting.session_id
 GROUP BY 1, 2
 ORDER BY 1, 2

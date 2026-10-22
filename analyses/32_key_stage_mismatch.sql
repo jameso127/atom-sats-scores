@@ -32,19 +32,19 @@ questions AS (
 )
 
 SELECT
-    a.key_stage                                      AS assessment_key_stage,
-    s.key_stage                                      AS pupil_key_stage,
-    q.subject_name,
-    s.key_stage = a.key_stage                        AS is_scored,
-    COUNT(*)                                         AS n_responses,
-    COUNT(DISTINCT r.pupil_id)                       AS n_pupils,
-    COUNT(DISTINCT s.session_id)                     AS n_sittings,
-    COUNT(DISTINCT a.assessment_id)                  AS n_assessments,
-    COUNTIF(a.n_ks1_sittings = a.n_ks2_sittings) > 0 AS has_tied_assessment
-FROM `atom-analytics-candidates.de_raw.responses` AS r
-INNER JOIN sittings AS s ON r.session_id = s.session_id
-INNER JOIN assessments AS a ON s.assessment_id = a.assessment_id
-INNER JOIN questions AS q ON r.question_id = q.question_id
-WHERE s.style IN ('fixed_question', 'non_adaptive')
+    assess.key_stage                                           AS assessment_key_stage,
+    sitting.key_stage                                          AS pupil_key_stage,
+    question.subject_name,
+    sitting.key_stage = assess.key_stage                       AS is_scored,
+    COUNT(*)                                                   AS n_responses,
+    COUNT(DISTINCT resp.pupil_id)                              AS n_pupils,
+    COUNT(DISTINCT sitting.session_id)                         AS n_sittings,
+    COUNT(DISTINCT assess.assessment_id)                       AS n_assessments,
+    COUNTIF(assess.n_ks1_sittings = assess.n_ks2_sittings) > 0 AS has_tied_assessment
+FROM `atom-analytics-candidates.de_raw.responses` AS resp
+INNER JOIN sittings AS sitting ON resp.session_id = sitting.session_id
+INNER JOIN assessments AS assess ON sitting.assessment_id = assess.assessment_id
+INNER JOIN questions AS question ON resp.question_id = question.question_id
+WHERE sitting.style IN ('fixed_question', 'non_adaptive')
 GROUP BY 1, 2, 3, 4
 ORDER BY 1, 2, 3

@@ -14,27 +14,27 @@
 -- Every subject is kept; only Maths and English get a scaled score later. Incremental runs
 -- recompute the last var('lookback_days') days and replace those whole day partitions.
 SELECT
-    r.pupil_id,
-    q.subject_name,
-    s.key_stage,
-    s.year_group_at_sitting                                                                AS year_group,
-    r.answered_date,
+    resp.pupil_id,
+    question.subject_name,
+    sitting.key_stage,
+    sitting.year_group_at_sitting                                                                AS year_group,
+    resp.answered_date,
     -- Academic year (Sep-Aug): its conversion table is the one STA published the June / July before.
-    EXTRACT(YEAR FROM r.answered_date) - IF(EXTRACT(MONTH FROM r.answered_date) < 9, 1, 0) AS academic_year,
-    COUNT(*)                                                                               AS n_answered,
-    COUNTIF(r.is_correct)                                                                  AS n_correct
-FROM {{ ref('stg_responses') }} AS r
-INNER JOIN {{ ref('stg_assessment_sittings') }} AS s ON r.session_id = s.session_id
-INNER JOIN {{ ref('trf_assessment_key_stage') }} AS a ON s.assessment_id = a.assessment_id
-INNER JOIN {{ ref('stg_pupils') }} AS p ON r.pupil_id = p.pupil_id
-INNER JOIN {{ ref('stg_course_hierarchy') }} AS q ON r.question_id = q.question_id
+    EXTRACT(YEAR FROM resp.answered_date) - IF(EXTRACT(MONTH FROM resp.answered_date) < 9, 1, 0) AS academic_year,
+    COUNT(*)                                                                                     AS n_answered,
+    COUNTIF(resp.is_correct)                                                                     AS n_correct
+FROM {{ ref('stg_responses') }} AS resp
+INNER JOIN {{ ref('stg_assessment_sittings') }} AS sitting ON resp.session_id = sitting.session_id
+INNER JOIN {{ ref('trf_assessment_key_stage') }} AS assess ON sitting.assessment_id = assess.assessment_id
+INNER JOIN {{ ref('stg_pupils') }} AS pupil ON resp.pupil_id = pupil.pupil_id
+INNER JOIN {{ ref('stg_course_hierarchy') }} AS question ON resp.question_id = question.question_id
 WHERE
-    s.style IN ('fixed_question', 'non_adaptive')
-    AND s.key_stage = a.key_stage
+    sitting.style IN ('fixed_question', 'non_adaptive')
+    AND sitting.key_stage = assess.key_stage
     {% if is_incremental() %}
-        AND r.answered_date >= (
+        AND resp.answered_date >= (
             SELECT DATE_SUB(MAX(existing.answered_date), INTERVAL {{ var('lookback_days') }} DAY)
             FROM {{ this }} AS existing
         )
     {% endif %}
-GROUP BY r.pupil_id, q.subject_name, s.key_stage, s.year_group_at_sitting, r.answered_date
+GROUP BY resp.pupil_id, question.subject_name, sitting.key_stage, sitting.year_group_at_sitting, resp.answered_date

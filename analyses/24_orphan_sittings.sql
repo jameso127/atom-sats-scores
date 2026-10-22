@@ -13,15 +13,15 @@ WITH questions AS (
 
 orphans AS (
     SELECT
-        r.session_type,
-        r.question_id,
-        r.pupil_id,
-        r.session_id,
-        r.answered_at
-    FROM `atom-analytics-candidates.de_raw.responses` AS r
-    LEFT JOIN `atom-analytics-candidates.de_raw.assessment_sittings` AS s
-        ON r.session_id = s.session_id
-    WHERE s.session_id IS NULL
+        resp.session_type,
+        resp.question_id,
+        resp.pupil_id,
+        resp.session_id,
+        resp.answered_at
+    FROM `atom-analytics-candidates.de_raw.responses` AS resp
+    LEFT JOIN `atom-analytics-candidates.de_raw.assessment_sittings` AS sitting
+        ON resp.session_id = sitting.session_id
+    WHERE sitting.session_id IS NULL
 ),
 
 pupils_with_sittings AS (
@@ -30,16 +30,16 @@ pupils_with_sittings AS (
 )
 
 SELECT
-    o.session_type,
-    q.subject_name,
-    pws.pupil_id IS NOT NULL     AS pupil_has_valid_sittings,
-    COUNT(*)                     AS n_responses,
-    COUNT(DISTINCT o.session_id) AS n_sittings,
-    COUNT(DISTINCT o.pupil_id)   AS n_pupils,
-    MIN(o.answered_at)           AS min_answered_at,
-    MAX(o.answered_at)           AS max_answered_at
-FROM orphans AS o
-LEFT JOIN questions AS q ON o.question_id = q.question_id
-LEFT JOIN pupils_with_sittings AS pws ON o.pupil_id = pws.pupil_id
+    orph.session_type,
+    question.subject_name,
+    with_sit.pupil_id IS NOT NULL   AS pupil_has_valid_sittings,
+    COUNT(*)                        AS n_responses,
+    COUNT(DISTINCT orph.session_id) AS n_sittings,
+    COUNT(DISTINCT orph.pupil_id)   AS n_pupils,
+    MIN(orph.answered_at)           AS min_answered_at,
+    MAX(orph.answered_at)           AS max_answered_at
+FROM orphans AS orph
+LEFT JOIN questions AS question ON orph.question_id = question.question_id
+LEFT JOIN pupils_with_sittings AS with_sit ON orph.pupil_id = with_sit.pupil_id
 GROUP BY 1, 2, 3
 ORDER BY 1, 2, 3

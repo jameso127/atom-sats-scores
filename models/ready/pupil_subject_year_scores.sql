@@ -21,21 +21,21 @@ WITH totals AS (
 )
 
 SELECT
-    t.pupil_id,
-    t.subject_name,
-    t.key_stage,
-    t.year_group,
-    t.n_answered,
-    t.n_correct,
-    100 * t.n_correct / t.n_answered AS percent_correct,
-    s.scaled_score,
-    s.test_year                      AS conversion_table_year,
-    t.last_answered_date
-FROM totals AS t
-LEFT JOIN {{ ref('trf_percent_to_scaled_score') }} AS s
+    total.pupil_id,
+    total.subject_name,
+    total.key_stage,
+    total.year_group,
+    total.n_answered,
+    total.n_correct,
+    100 * total.n_correct / total.n_answered AS percent_correct,
+    pct_lookup.scaled_score,
+    pct_lookup.test_year                     AS conversion_table_year,
+    total.last_answered_date
+FROM totals AS total
+LEFT JOIN {{ ref('trf_percent_to_scaled_score') }} AS pct_lookup
     ON
-        t.key_stage = s.key_stage
-        AND t.academic_year = s.test_year
-        AND t.subject_name = s.subject_name
+        total.key_stage = pct_lookup.key_stage
+        AND total.academic_year = pct_lookup.test_year
+        AND total.subject_name = pct_lookup.subject_name
         -- % correct rounded down to a whole percent.
-        AND DIV(100 * t.n_correct, t.n_answered) = s.percent_correct
+        AND DIV(100 * total.n_correct, total.n_answered) = pct_lookup.percent_correct

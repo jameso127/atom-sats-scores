@@ -24,28 +24,28 @@ questions AS (
 
 in_scope AS (
     SELECT
-        r.pupil_id,
-        q.subject_name,
+        resp.pupil_id,
+        question.subject_name,
         COUNT(*) AS n_responses
-    FROM `atom-analytics-candidates.de_raw.responses` AS r
-    INNER JOIN `atom-analytics-candidates.de_raw.assessment_sittings` AS s
-        ON r.session_id = s.session_id
-    INNER JOIN questions AS q ON r.question_id = q.question_id
+    FROM `atom-analytics-candidates.de_raw.responses` AS resp
+    INNER JOIN `atom-analytics-candidates.de_raw.assessment_sittings` AS sitting
+        ON resp.session_id = sitting.session_id
+    INNER JOIN questions AS question ON resp.question_id = question.question_id
     WHERE
-        NOT COALESCE(s.is_deleted, FALSE)
-        AND s.style IN ('fixed_question', 'non_adaptive')
-        AND q.subject_name IN ('Maths', 'English', 'Science')
-    GROUP BY r.pupil_id, q.subject_name
+        NOT COALESCE(sitting.is_deleted, FALSE)
+        AND sitting.style IN ('fixed_question', 'non_adaptive')
+        AND question.subject_name IN ('Maths', 'English', 'Science')
+    GROUP BY resp.pupil_id, question.subject_name
 ),
 
 pupil_subjects AS (
     SELECT
-        p.pupil_id,
-        sub.subject_name,
-        COALESCE(i.n_responses, 0) AS n_responses
-    FROM pupils AS p
-    CROSS JOIN subjects AS sub
-    LEFT JOIN in_scope AS i ON p.pupil_id = i.pupil_id AND sub.subject_name = i.subject_name
+        pupil.pupil_id,
+        subj.subject_name,
+        COALESCE(scoped.n_responses, 0) AS n_responses
+    FROM pupils AS pupil
+    CROSS JOIN subjects AS subj
+    LEFT JOIN in_scope AS scoped ON pupil.pupil_id = scoped.pupil_id AND subj.subject_name = scoped.subject_name
 )
 
 SELECT

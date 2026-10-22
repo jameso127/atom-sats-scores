@@ -31,24 +31,24 @@ questions AS (
 
 classified AS (
     SELECT
-        r.pupil_id,
-        r.session_id,
+        resp.pupil_id,
+        resp.session_id,
         CASE
-            WHEN p.pupil_id IS NULL THEN '1 pupil not found'
-            WHEN p.is_deleted THEN '2 pupil deleted'
-            WHEN s.session_id IS NULL THEN '3 sitting not found'
-            WHEN s.is_deleted THEN '4 sitting deleted'
-            WHEN s.style IS NULL OR s.style NOT IN ('fixed_question', 'non_adaptive')
-                THEN '5 style ' || COALESCE(s.style, 'null')
-            WHEN q.question_id IS NULL THEN '6 question not found'
-            WHEN q.subject_name IS NULL OR q.subject_name NOT IN ('Maths', 'English', 'Science')
-                THEN '7 subject ' || COALESCE(q.subject_name, 'null')
+            WHEN pupil.pupil_id IS NULL THEN '1 pupil not found'
+            WHEN pupil.is_deleted THEN '2 pupil deleted'
+            WHEN sitting.session_id IS NULL THEN '3 sitting not found'
+            WHEN sitting.is_deleted THEN '4 sitting deleted'
+            WHEN sitting.style IS NULL OR sitting.style NOT IN ('fixed_question', 'non_adaptive')
+                THEN '5 style ' || COALESCE(sitting.style, 'null')
+            WHEN question.question_id IS NULL THEN '6 question not found'
+            WHEN question.subject_name IS NULL OR question.subject_name NOT IN ('Maths', 'English', 'Science')
+                THEN '7 subject ' || COALESCE(question.subject_name, 'null')
             ELSE '9 in scope'
         END AS outcome
-    FROM `atom-analytics-candidates.de_raw.responses` AS r
-    LEFT JOIN pupils AS p ON r.pupil_id = p.pupil_id
-    LEFT JOIN sittings AS s ON r.session_id = s.session_id
-    LEFT JOIN questions AS q ON r.question_id = q.question_id
+    FROM `atom-analytics-candidates.de_raw.responses` AS resp
+    LEFT JOIN pupils AS pupil ON resp.pupil_id = pupil.pupil_id
+    LEFT JOIN sittings AS sitting ON resp.session_id = sitting.session_id
+    LEFT JOIN questions AS question ON resp.question_id = question.question_id
 )
 
 SELECT

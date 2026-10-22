@@ -49,7 +49,9 @@ ai/           planning_log.md; sources/ = saved GOV.UK pages
 - **SQLFluff** enforces style: run `uv run sqlfluff fix models tests analyses`, then `lint`, after
   any SQL change. It uses the Jinja templater with dbt builtins, so it runs locally without dbt or
   BigQuery. **Keywords, functions, literals and types in CAPITALS; names lowercase.** Column
-  aliases aligned within each select; explicit `AS` for tables and columns.
+  aliases aligned within each select; explicit `AS` for tables and columns. **Table aliases at
+  least 4 characters** (`resp`, `sitting`, `pupil`, `question`, `assess`, not `r` / `s` / `p`);
+  avoid BigQuery reserved words (e.g. `lookup`, `model`).
 - **No `SELECT *` or `t.*`**: always list the columns.
 - **As simple as possible:** a plain select with joins when one query does the job; a CTE only
   for a step that needs its own query (an aggregate to join on, a `QUALIFY` pick). No
