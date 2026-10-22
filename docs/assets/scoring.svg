@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300" role="img">
+<style>
+  .t { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #15245e; }
+  .h { font-family: 'National B Condensed', 'Arial Narrow', 'Roboto Condensed', 'Segoe UI', sans-serif; font-weight: 800; fill: #15245e; }
+  .cap { font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+</style>
+<rect width="1200" height="300" rx="24" fill="#f3f8ff"/>
+  <g opacity="0">
+    <rect x="24" y="40" width="210" height="220" rx="20" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+    <text x="129" y="78" class="cap" font-size="13" font-weight="400" text-anchor="middle" style="fill:#2986ff" >1 · ADD UP</text>
+    <text x="129" y="142" class="h" font-size="34" font-weight="400" text-anchor="middle" style="fill:#2986ff" >157 / 181</text>
+    <text x="129" y="178" class="t" font-size="15" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >answers correct</text>
+    <text x="129" y="232" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >Year 2 · English</text>
+    
+    <animate attributeName="opacity" from="0" to="1" begin="0.2s" dur="0.6s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" from="0 16" to="0 0" begin="0.2s" dur="0.6s" fill="freeze"/>
+  </g>
+  <path d="M 238 150 l 14 0 m -6 -7 l 7 7 l -7 7" fill="none" stroke="#99c9ff" stroke-width="3" stroke-linecap="round"/>
+  <g opacity="0">
+    <rect x="258" y="40" width="210" height="220" rx="20" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+    <text x="363" y="78" class="cap" font-size="13" font-weight="400" text-anchor="middle" style="fill:#2986ff" >2 · % CORRECT</text>
+    <text x="363" y="142" class="h" font-size="44" font-weight="400" text-anchor="middle" style="fill:#2986ff" >86%</text>
+    <text x="363" y="178" class="t" font-size="15" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >86.7%, rounded down</text>
+    <text x="363" y="232" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" ></text>
+    <rect x="280" y="196" width="166" height="12" rx="6" fill="#e5f1ff"/>
+    <rect x="280" y="196" width="0" height="12" rx="6" fill="#4fbf5e">
+      <animate attributeName="width" from="0" to="143" begin="1.2s" dur="1s" fill="freeze"/>
+    </rect>
+    <animate attributeName="opacity" from="0" to="1" begin="1.0s" dur="0.6s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" from="0 16" to="0 0" begin="1.0s" dur="0.6s" fill="freeze"/>
+  </g>
+  <path d="M 472 150 l 14 0 m -6 -7 l 7 7 l -7 7" fill="none" stroke="#99c9ff" stroke-width="3" stroke-linecap="round"/>
+  <g opacity="0">
+    <rect x="492" y="40" width="210" height="220" rx="20" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+    <text x="597" y="78" class="cap" font-size="13" font-weight="400" text-anchor="middle" style="fill:#2986ff" >3 · RAW MARKS</text>
+    <text x="597" y="142" class="h" font-size="44" font-weight="400" text-anchor="middle" style="fill:#2986ff" >34 · 34</text>
+    <text x="597" y="178" class="t" font-size="15" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >GPS /40 · reading /40</text>
+    <text x="597" y="232" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >⌊86 × 40 / 100⌋</text>
+    
+    <animate attributeName="opacity" from="0" to="1" begin="1.8s" dur="0.6s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" from="0 16" to="0 0" begin="1.8s" dur="0.6s" fill="freeze"/>
+  </g>
+  <path d="M 706 150 l 14 0 m -6 -7 l 7 7 l -7 7" fill="none" stroke="#99c9ff" stroke-width="3" stroke-linecap="round"/>
+  <g opacity="0">
+    <rect x="726" y="40" width="210" height="220" rx="20" fill="#ffffff" stroke="#c2dfff" stroke-width="2" />
+    <text x="831" y="78" class="cap" font-size="13" font-weight="400" text-anchor="middle" style="fill:#2986ff" >4 · STA TABLES</text>
+    <text x="831" y="142" class="h" font-size="34" font-weight="400" text-anchor="middle" style="fill:#2986ff" >109 · 107</text>
+    <text x="831" y="178" class="t" font-size="15" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >KS1 2025 tables</text>
+    <text x="831" y="232" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#5d6c7b" >GPS · reading</text>
+    
+    <animate attributeName="opacity" from="0" to="1" begin="2.6s" dur="0.6s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" from="0 16" to="0 0" begin="2.6s" dur="0.6s" fill="freeze"/>
+  </g>
+  <path d="M 940 150 l 14 0 m -6 -7 l 7 7 l -7 7" fill="none" stroke="#99c9ff" stroke-width="3" stroke-linecap="round"/>
+  <g opacity="0">
+    <rect x="960" y="40" width="210" height="220" rx="20" fill="#2986ff" stroke="#2986ff" stroke-width="2" />
+    <text x="1065" y="78" class="cap" font-size="13" font-weight="400" text-anchor="middle" style="fill:#e5f1ff" >5 · SCALED SCORE</text>
+    <text x="1065" y="142" class="h" font-size="44" font-weight="400" text-anchor="middle" style="fill:#ffffff" >108</text>
+    <text x="1065" y="178" class="t" font-size="15" font-weight="400" text-anchor="middle" style="fill:#e5f1ff" >½ GPS + ½ reading</text>
+    <text x="1065" y="232" class="t" font-size="14" font-weight="400" text-anchor="middle" style="fill:#e5f1ff" >KS1 scale 85–115</text>
+    
+    <animate attributeName="opacity" from="0" to="1" begin="3.4s" dur="0.6s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" from="0 16" to="0 0" begin="3.4s" dur="0.6s" fill="freeze"/>
+  </g>
+  
+</svg>

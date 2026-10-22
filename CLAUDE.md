@@ -40,7 +40,8 @@ models/
   ready/      pupil_subject_year_scores, pupil_subject_sats_scores (the long app table); no prefix
 seeds/        seed_subject_to_test.csv; scaled_scores/seed_scaled_scores_<ks1|ks2>_<year>.csv
 tests/        assert_*.sql singular tests
-scripts/      build_conversion_seed.py (GOV.UK → seed), run_analyses.py (profiling runner)
+scripts/      build_conversion_seed.py (GOV.UK → seed), run_analyses.py (profiling runner),
+              make_readme_assets.py (README illustrations → docs/assets/; re-run when numbers change)
 analyses/     NN_*.sql profiling / verification queries + FINDINGS.md (results/ is git-ignored)
 ai/           planning_log.md; sources/ = saved GOV.UK pages
 ```
